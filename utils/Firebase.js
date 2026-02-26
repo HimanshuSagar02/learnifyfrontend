@@ -1,70 +1,58 @@
-import {getAuth, GoogleAuthProvider} from "firebase/auth"
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 
 const isDev = Boolean(import.meta.env.DEV);
 
-// Firebase configuration for Learnify Platform
-// Values from Firebase Console → Project Settings → Your apps
-// IMPORTANT: Get the API key from Firebase Console, not from here
-// The API key below might be invalid - use environment variable instead
+const readEnv = (key) => String(import.meta.env[key] || "").trim();
+
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_APIKEY || "AIzaSyCVDIYPWKVAyb8ZsNM6VL0l3eUGiX0T4u0",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTHDOMAIN || "learnify.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECTID || "learnify",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGEBUCKET || "learnify.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGINGSENDERID || "1046096417550",
-  appId: import.meta.env.VITE_FIREBASE_APPID || "1:1046096417550:web:7bd27957c310b89924fd5f",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENTID || "G-PMVK5MGY9W"
+  apiKey: readEnv("VITE_FIREBASE_APIKEY"),
+  authDomain: readEnv("VITE_FIREBASE_AUTHDOMAIN"),
+  projectId: readEnv("VITE_FIREBASE_PROJECTID"),
+  storageBucket: readEnv("VITE_FIREBASE_STORAGEBUCKET"),
+  messagingSenderId: readEnv("VITE_FIREBASE_MESSAGINGSENDERID"),
+  appId: readEnv("VITE_FIREBASE_APPID"),
+  measurementId: readEnv("VITE_FIREBASE_MEASUREMENTID"),
 };
 
-// Validate API key format
-if (firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('AIzaSy')) {
-  if (isDev) {
-    console.warn("Firebase API key format looks incorrect. It should start with 'AIzaSy'.");
-  }
-}
+const requiredKeys = ["apiKey", "authDomain", "projectId", "appId"];
+const missingKeys = requiredKeys.filter((key) => !firebaseConfig[key]);
+const analyticsEnabled = readEnv("VITE_ENABLE_FIREBASE_ANALYTICS") === "true";
 
-// Initialize Firebase
-let app, auth, provider, analytics;
+let app = null;
+let auth = null;
+let provider = null;
+let analytics = null;
 
 try {
-  // Validate API key before initializing
-  if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "AIzaSyDummyKeyIfNotSet" || !firebaseConfig.apiKey.startsWith('AIzaSy')) {
-    if (isDev) {
-      console.error("Invalid Firebase API key. Please set VITE_FIREBASE_APIKEY in frontend/.env.");
-    }
-    throw new Error("Invalid Firebase API key");
+  if (missingKeys.length > 0) {
+    throw new Error(`Missing Firebase config keys: ${missingKeys.join(", ")}`);
   }
-  
+
+  if (!firebaseConfig.apiKey.startsWith("AIzaSy")) {
+    throw new Error("Invalid Firebase API key format.");
+  }
+
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   provider = new GoogleAuthProvider();
-  
-  // Add scopes for Google Sign-In
-  provider.addScope('email');
-  provider.addScope('profile');
-  
-  // Initialize Analytics (only in browser, not in SSR)
-  if (typeof window !== 'undefined') {
-    try {
-      analytics = getAnalytics(app);
-    } catch (analyticsError) {
-      if (isDev) {
-        console.warn("Firebase Analytics initialization failed:", analyticsError);
-      }
-      // Analytics is optional, continue without it
-    }
+  provider.addScope("email");
+  provider.addScope("profile");
+
+  // Analytics triggers Firebase Installations; keep it opt-in.
+  if (typeof window !== "undefined" && analyticsEnabled && firebaseConfig.measurementId) {
+    analytics = getAnalytics(app);
   }
 } catch (error) {
   if (isDev) {
-    console.error("Firebase initialization error:", error);
+    console.error("[Firebase] Initialization error:", error);
   }
-  
-  // Create dummy objects to prevent crashes
+
+  app = null;
   auth = null;
   provider = null;
   analytics = null;
 }
 
-export {auth, provider, analytics}
+export { app, auth, provider, analytics };

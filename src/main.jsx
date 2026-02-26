@@ -4,6 +4,7 @@ import App from './App.jsx'
 import { BrowserRouter, HashRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { store } from './redux/store.js'
+import AppErrorBoundary from './components/AppErrorBoundary.jsx'
 
 const isBrowser = typeof window !== 'undefined'
 const hostname = isBrowser ? window.location.hostname : ''
@@ -29,11 +30,49 @@ if (isBrowser && shouldUseHashRouter && !window.location.hash.startsWith('#/')) 
 
 const Router = shouldUseHashRouter ? HashRouter : BrowserRouter
 
+const CHUNK_RECOVERY_KEY = 'learnify:chunk-recovery'
+const CHUNK_RECOVERY_INSTALLED = '__learnifyChunkRecoveryInstalled__'
+
+const isChunkLoadFailure = (errorLike) => {
+  const message = String(
+    errorLike?.message ||
+    errorLike?.reason?.message ||
+    errorLike ||
+    ''
+  )
+  return /ChunkLoadError|Loading chunk .* failed|Failed to fetch dynamically imported module|Importing a module script failed/i.test(message)
+}
+
+if (isBrowser && !window[CHUNK_RECOVERY_INSTALLED]) {
+  window[CHUNK_RECOVERY_INSTALLED] = true
+
+  const recoverFromChunkFailure = (errorLike) => {
+    if (!isChunkLoadFailure(errorLike)) return
+    const alreadyReloaded = window.sessionStorage.getItem(CHUNK_RECOVERY_KEY) === '1'
+    if (alreadyReloaded) return
+    window.sessionStorage.setItem(CHUNK_RECOVERY_KEY, '1')
+    window.location.reload()
+  }
+
+  window.addEventListener('error', (event) => {
+    recoverFromChunkFailure(event.error || event.message)
+  })
+
+  window.addEventListener('unhandledrejection', (event) => {
+    recoverFromChunkFailure(event.reason)
+  })
+
+  window.addEventListener('load', () => {
+    window.sessionStorage.removeItem(CHUNK_RECOVERY_KEY)
+  }, { once: true })
+}
+
 createRoot(document.getElementById('root')).render(
-  <Router>
-  <Provider store={store}>
-    <App />
-  </Provider>
-  </Router>
-  
+  <AppErrorBoundary>
+    <Router>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </Router>
+  </AppErrorBoundary>
 )
