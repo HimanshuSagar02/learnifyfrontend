@@ -13,6 +13,7 @@ import { ClipLoader } from 'react-spinners'
 import { useDispatch } from 'react-redux'
 import { setUserData } from '../redux/userSlice'
 import { clearSessionHint, markSessionHint } from '../utils/sessionHint'
+import { extractAuthUser } from '../utils/authPayload'
 
 function Login() {
     const [email, setEmail] = useState("")
@@ -35,10 +36,16 @@ function Login() {
 
         setLoading(true)
         try {
-            const result = await axios.post(`${serverUrl}/api/auth/login`, {email, password}, {withCredentials: true})
-            
-            if (result.data && result.data._id) {
-                dispatch(setUserData(result.data))
+            const result = await axios.post(
+                `${serverUrl}/api/auth/login`,
+                { email: email.trim(), password },
+                { withCredentials: true }
+            )
+
+            const authUser = extractAuthUser(result.data)
+
+            if (authUser) {
+                dispatch(setUserData(authUser))
                 markSessionHint()
                 
                 setTimeout(() => {
@@ -46,7 +53,7 @@ function Login() {
                     toast.success("Login Successfully")
                 }, 100);
             } else {
-                throw new Error("Invalid response from server")
+                throw new Error(result?.data?.message || "Invalid response from server")
             }
             setLoading(false)
         } catch (error) {
@@ -58,7 +65,7 @@ function Login() {
             } else if (error.request) {
                 toast.error("Cannot connect to server. Please check your internet connection.")
             } else {
-                toast.error("Login failed. Please try again.")
+                toast.error(error.message || "Login failed. Please try again.")
             }
             clearSessionHint()
         }

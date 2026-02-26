@@ -4,6 +4,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../redux/userSlice";
 import { clearSessionHint, markSessionHint } from "../utils/sessionHint";
+import { extractAuthUser } from "../utils/authPayload";
 
 const useCurrentUser = () => {
   const dispatch = useDispatch();
@@ -22,9 +23,11 @@ const useCurrentUser = () => {
           timeout: 10000,
         });
 
-        if (result.data && result.data._id) {
+        const authUser = extractAuthUser(result.data);
+
+        if (authUser) {
           markSessionHint();
-          dispatch(setUserData(result.data));
+          dispatch(setUserData(authUser));
           return;
         }
 
