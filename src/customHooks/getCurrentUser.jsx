@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUserData } from "../redux/userSlice";
 import { clearSessionHint, markSessionHint } from "../utils/sessionHint";
 import { extractAuthUser } from "../utils/authPayload";
+import { clearAuthToken } from "../utils/authToken";
 
 const useCurrentUser = () => {
   const dispatch = useDispatch();
@@ -32,11 +33,13 @@ const useCurrentUser = () => {
         }
 
         clearSessionHint();
+        clearAuthToken();
         dispatch(setUserData(null));
       } catch (error) {
         const status = error?.response?.status;
         if (status === 401 || status === 403 || status === 503) {
           clearSessionHint();
+          clearAuthToken();
         }
         dispatch(setUserData(null));
       }

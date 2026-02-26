@@ -13,6 +13,8 @@ import { toast } from 'react-toastify'
 import { useDispatch } from 'react-redux'
 import { setUserData } from '../redux/userSlice'
 import { clearSessionHint, markSessionHint } from '../utils/sessionHint'
+import { extractAuthToken, extractAuthUser } from '../utils/authPayload'
+import { clearAuthToken, setAuthToken } from '../utils/authToken'
 
 function SignUp() {
     const [name, setName] = useState("")
@@ -56,7 +58,11 @@ function SignUp() {
                 class: studentClass,
                 subject: subject
             }, {withCredentials: true})
-            dispatch(setUserData(result.data))
+            const authToken = extractAuthToken(result.data)
+            if (authToken) {
+                setAuthToken(authToken)
+            }
+            dispatch(setUserData(extractAuthUser(result.data) || result.data))
             markSessionHint()
             navigate("/")
             toast.success("SignUp Successfully")
@@ -65,6 +71,7 @@ function SignUp() {
         catch (error) {
             setLoading(false)
             clearSessionHint()
+            clearAuthToken()
             toast.error(error.response?.data?.message || error.response?.data?.error || "Signup failed")
         }
     }
@@ -107,8 +114,12 @@ function SignUp() {
                 class: studentClass,
                 subject: subject
             }, {withCredentials: true})
+            const authToken = extractAuthToken(result.data)
+            if (authToken) {
+                setAuthToken(authToken)
+            }
             
-            dispatch(setUserData(result.data))
+            dispatch(setUserData(extractAuthUser(result.data) || result.data))
             markSessionHint()
             
             setTimeout(() => {
@@ -119,6 +130,7 @@ function SignUp() {
         } catch (error) {
             setGoogleLoading(false)
             clearSessionHint()
+            clearAuthToken()
             
             if (error.code === 'auth/popup-closed-by-user') {
                 toast.error("Sign-in popup was closed. Please try again.")

@@ -10,6 +10,7 @@ import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserData } from '../redux/userSlice';
 import { clearSessionHint } from '../utils/sessionHint';
+import { clearAuthToken } from '../utils/authToken';
 
 function Nav() {
   const [showHam, setShowHam] = useState(false)
@@ -33,6 +34,7 @@ function Nav() {
     } finally {
       await dispatch(setUserData(null))
       clearSessionHint()
+      clearAuthToken()
       navigate("/")
     }
   }

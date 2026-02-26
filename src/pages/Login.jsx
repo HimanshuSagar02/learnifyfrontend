@@ -13,7 +13,8 @@ import { ClipLoader } from 'react-spinners'
 import { useDispatch } from 'react-redux'
 import { setUserData } from '../redux/userSlice'
 import { clearSessionHint, markSessionHint } from '../utils/sessionHint'
-import { extractAuthUser } from '../utils/authPayload'
+import { extractAuthToken, extractAuthUser } from '../utils/authPayload'
+import { clearAuthToken, setAuthToken } from '../utils/authToken'
 
 function Login() {
     const [email, setEmail] = useState("")
@@ -49,6 +50,10 @@ function Login() {
                 { email: email.trim(), password },
                 { withCredentials: true }
             )
+            const loginToken = extractAuthToken(result.data)
+            if (loginToken) {
+                setAuthToken(loginToken)
+            }
 
             const directUser = extractAuthUser(result.data)
             if (directUser) {
@@ -65,6 +70,10 @@ function Login() {
             const sessionUser = extractAuthUser(sessionResult.data)
 
             if (sessionUser) {
+                const sessionToken = extractAuthToken(sessionResult.data)
+                if (sessionToken) {
+                    setAuthToken(sessionToken)
+                }
                 finalizeLogin(sessionUser)
                 setLoading(false)
                 return
@@ -84,6 +93,7 @@ function Login() {
             )
         } catch (error) {
             setLoading(false)
+            clearAuthToken()
             
             if (error.response) {
                 const errorMessage = error.response.data?.message || error.response.data?.error || "Login failed"
@@ -124,8 +134,12 @@ function Login() {
                 email, 
                 photoUrl
             }, {withCredentials: true})
+            const loginToken = extractAuthToken(result.data)
+            if (loginToken) {
+                setAuthToken(loginToken)
+            }
             
-            dispatch(setUserData(result.data))
+            dispatch(setUserData(extractAuthUser(result.data) || result.data))
             markSessionHint()
             
             setTimeout(() => {
@@ -136,6 +150,7 @@ function Login() {
         } catch (error) {
             setGoogleLoading(false)
             clearSessionHint()
+            clearAuthToken()
             
             if (error.code === 'auth/popup-closed-by-user') {
                 toast.error("Sign-in popup was closed. Please try again.")

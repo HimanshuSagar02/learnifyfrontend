@@ -29,3 +29,27 @@ export const extractAuthUser = (payload) => {
 
   return null;
 };
+
+export const extractAuthToken = (payload) => {
+  if (!isObject(payload)) return "";
+
+  const candidates = [
+    payload.authToken,
+    payload.token,
+    payload.data?.authToken,
+    payload.data?.token,
+    payload.user?.authToken,
+    payload.user?.token,
+    payload.result?.authToken,
+    payload.result?.token,
+  ];
+
+  for (const candidate of candidates) {
+    const normalized = String(candidate || "").trim();
+    if (normalized) {
+      return normalized;
+    }
+  }
+
+  return "";
+};

@@ -5,6 +5,7 @@ import { BrowserRouter, HashRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { store } from './redux/store.js'
 import AppErrorBoundary from './components/AppErrorBoundary.jsx'
+import { initializeAuthToken } from './utils/authToken.js'
 
 const isBrowser = typeof window !== 'undefined'
 const hostname = isBrowser ? window.location.hostname : ''
@@ -66,6 +67,8 @@ if (isBrowser && !window[CHUNK_RECOVERY_INSTALLED]) {
     window.sessionStorage.removeItem(CHUNK_RECOVERY_KEY)
   }, { once: true })
 }
+
+initializeAuthToken()
 
 createRoot(document.getElementById('root')).render(
   <AppErrorBoundary>
