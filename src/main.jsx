@@ -11,15 +11,17 @@ const isBrowser = typeof window !== 'undefined'
 const hostname = isBrowser ? window.location.hostname : ''
 const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1'
 const routerMode = String(import.meta.env.VITE_ROUTER_MODE || '').toLowerCase()
+const allowBrowserRouterInProd = String(import.meta.env.VITE_ALLOW_BROWSER_ROUTER_PROD || '').toLowerCase() === 'true'
 
 const shouldUseHashRouter =
   routerMode === 'hash' ||
   (
-    routerMode !== 'browser' &&
-    (
-      import.meta.env.VITE_USE_HASH_ROUTER === 'true' ||
-      (import.meta.env.PROD && !isLocalhost)
-    )
+    routerMode === 'browser'
+      ? (import.meta.env.PROD && !isLocalhost && !allowBrowserRouterInProd)
+      : (
+        import.meta.env.VITE_USE_HASH_ROUTER === 'true' ||
+        (import.meta.env.PROD && !isLocalhost)
+      )
   )
 
 if (isBrowser && shouldUseHashRouter && !window.location.hash.startsWith('#/')) {
@@ -31,8 +33,8 @@ if (isBrowser && shouldUseHashRouter && !window.location.hash.startsWith('#/')) 
 
 const Router = shouldUseHashRouter ? HashRouter : BrowserRouter
 
-const CHUNK_RECOVERY_KEY = 'learnify:chunk-recovery'
-const CHUNK_RECOVERY_INSTALLED = '__learnifyChunkRecoveryInstalled__'
+const CHUNK_RECOVERY_KEY = 'Learnify:chunk-recovery'
+const CHUNK_RECOVERY_INSTALLED = '__LearnifyChunkRecoveryInstalled__'
 
 const isChunkLoadFailure = (errorLike) => {
   const message = String(

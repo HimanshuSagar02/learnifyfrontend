@@ -215,7 +215,7 @@ function Login() {
                             </div>
                             <div>
                                 <h1 className='text-2xl sm:text-3xl font-bold text-gray-900'>Welcome Back</h1>
-                                <p className='text-sm sm:text-base text-gray-600'>Login to your Learnify account</p>
+                                <p className='text-sm sm:text-base text-gray-600'>Login to your Learnify technical account</p>
                             </div>
                         </div>
                     </div>
@@ -225,10 +225,9 @@ function Login() {
                         <div className='flex items-start gap-3'>
                             <FaBook className='text-[#3B82F6] text-xl mt-0.5 flex-shrink-0' />
                             <div>
-                                <p className='font-bold text-gray-900 mb-1'>📚 Learnify</p>
+                                <p className='font-bold text-gray-900 mb-1'>Learnify</p>
                                 <p className='text-sm text-gray-700'>
-                                    Designed for <strong>9th to 12th grade students</strong> and <strong>NEET droppers</strong>. 
-                                    All courses are organized by class and subject.
+                                    Built for <strong>technical learning</strong> across software development, data, AI and cloud domains.
                                 </p>
                             </div>
                         </div>
@@ -364,19 +363,19 @@ function Login() {
                     <div className='relative z-10'>
                         <img src={logo} className='w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto mb-4 md:mb-6 rounded-xl sm:rounded-2xl border-4 border-[#3B82F6] shadow-2xl' alt="Learnify Logo" />
                         <h2 className='text-3xl sm:text-4xl md:text-5xl font-bold text-[#3B82F6] mb-2 md:mb-3'>Learnify</h2>
-                        <p className='text-base sm:text-lg md:text-xl text-white mb-4 md:mb-6 font-semibold'>Learnify</p>
+                        <p className='text-base sm:text-lg md:text-xl text-white mb-4 md:mb-6 font-semibold'>Technical Learning Platform</p>
                         <div className='bg-black bg-opacity-50 rounded-2xl p-6 border border-[#3B82F6] border-opacity-30'>
                             <div className='flex items-center justify-center gap-2 mb-4'>
                                 <FaGraduationCap className='text-[#3B82F6] text-2xl' />
-                                <p className='text-white text-lg font-semibold'>Your Learning Journey Starts Here</p>
+                                <p className='text-white text-lg font-semibold'>Your Tech Journey Starts Here</p>
                             </div>
                             <p className='text-white text-sm leading-relaxed mb-4'>
-                                Access personalized courses for <strong className='text-[#3B82F6]'>9th to 12th grade</strong> and <strong className='text-[#3B82F6]'>NEET preparation</strong>
+                                Access guided courses for <strong className='text-[#3B82F6]'>Data Structures</strong>, <strong className='text-[#3B82F6]'>Web Development</strong>, AI and more.
                             </p>
                             <div className='flex flex-wrap gap-2 justify-center'>
-                                <span className='px-3 py-1 bg-[#3B82F6] text-black rounded-full text-xs font-semibold'>Class-Based</span>
-                                <span className='px-3 py-1 bg-[#3B82F6] text-black rounded-full text-xs font-semibold'>Subject-Focused</span>
-                                <span className='px-3 py-1 bg-[#3B82F6] text-black rounded-full text-xs font-semibold'>NEET Ready</span>
+                                <span className='px-3 py-1 bg-[#3B82F6] text-black rounded-full text-xs font-semibold'>Project-Based</span>
+                                <span className='px-3 py-1 bg-[#3B82F6] text-black rounded-full text-xs font-semibold'>Mentor-Led</span>
+                                <span className='px-3 py-1 bg-[#3B82F6] text-black rounded-full text-xs font-semibold'>Career-Focused</span>
                             </div>
                         </div>
                     </div>
@@ -387,3 +386,7 @@ function Login() {
 }
 
 export default Login
+
+
+
+

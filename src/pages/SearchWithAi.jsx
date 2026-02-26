@@ -90,14 +90,14 @@ function SearchWithAi() {
             Search with <span className="text-[#1E40AF]">AI</span>
           </h1>
           <p className="text-sm text-gray-600 mb-6">
-            Ask any topic and get relevant course recommendations instantly.
+            Ask any technical topic and get relevant course recommendations instantly.
           </p>
 
           <div className="flex items-center rounded-xl border border-gray-300 bg-gray-100 shadow-sm relative">
             <input
               type="text"
               className="w-full px-4 py-3 pr-24 bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none text-sm sm:text-base"
-              placeholder="Try: 11th chemistry, NEET biology, JEE physics..."
+              placeholder="Try: data structures, web development, Spanish, German..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
             />

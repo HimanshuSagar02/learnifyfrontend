@@ -9,7 +9,7 @@ const defaultContent = {
     title: "",
     description: "",
     imageUrl: "",
-    ctaLabel: "Book Demo Class",
+    ctaLabel: "Book Demo Session",
     ctaLink: "",
     expiresAt: null,
     isActive: true,
@@ -89,7 +89,7 @@ function DashboardMarketingPanel({ userData }) {
         },
         { withCredentials: true }
       );
-      toast.success("Demo class request submitted");
+      toast.success("Demo session request submitted");
       setBookingForm((prev) => ({
         ...prev,
         phone: "",
@@ -110,7 +110,7 @@ function DashboardMarketingPanel({ userData }) {
     >
       <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
         <FaCalendarAlt className="text-[#3B82F6]" />
-        Book Demo Class
+        Book Demo Session
       </h3>
       <input
         type="text"
@@ -139,7 +139,7 @@ function DashboardMarketingPanel({ userData }) {
         type="text"
         value={bookingForm.className}
         onChange={(e) => setBookingForm((prev) => ({ ...prev, className: e.target.value }))}
-        placeholder="Class (e.g. 11th)"
+        placeholder="Branch (e.g. CSE)"
         className="w-full border rounded-lg px-3 py-2"
       />
       <input
@@ -159,7 +159,7 @@ function DashboardMarketingPanel({ userData }) {
         disabled={bookingLoading}
         className="w-full bg-[#3B82F6] text-black font-bold py-2.5 rounded-xl hover:bg-[#2563EB] disabled:opacity-60 flex items-center justify-center gap-2"
       >
-        <FaPhoneAlt /> {bookingLoading ? "Submitting..." : content.currentOffer.ctaLabel || "Book Demo Class"}
+        <FaPhoneAlt /> {bookingLoading ? "Submitting..." : content.currentOffer.ctaLabel || "Book Demo Session"}
       </button>
     </form>
   );
@@ -167,10 +167,10 @@ function DashboardMarketingPanel({ userData }) {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-3">
-          <FaBullhorn className="text-[#3B82F6]" />
-          Current Offers & Demo Class
-        </h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 flex items-center gap-3">
+            <FaBullhorn className="text-[#3B82F6]" />
+            Current Offers & Demo Sessions
+          </h2>
         <button
           onClick={fetchMarketingContent}
           className="w-full sm:w-auto px-4 py-2 bg-black text-[#3B82F6] rounded-xl font-semibold hover:bg-gray-900"
@@ -190,9 +190,9 @@ function DashboardMarketingPanel({ userData }) {
                 <h3 className="text-xl sm:text-2xl font-bold text-[#3B82F6]">
                   {content.currentOffer.title || "Special Offer"}
                 </h3>
-                <p className="mt-3 text-gray-200">
-                  {content.currentOffer.description || "Book your demo class and get personalized guidance."}
-                </p>
+                  <p className="mt-3 text-gray-200">
+                  {content.currentOffer.description || "Book your demo session and get personalized guidance."}
+                  </p>
                 {content.currentOffer.expiresAt && (
                   <p className="mt-3 text-sm text-[#3B82F6]">
                     Valid till: {new Date(content.currentOffer.expiresAt).toLocaleDateString()}
@@ -210,9 +210,9 @@ function DashboardMarketingPanel({ userData }) {
             </div>
           ) : (
             <div className="grid gap-4 lg:grid-cols-[1fr,1.2fr]">
-              <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-5 sm:p-8 text-center text-gray-500 flex items-center justify-center">
-                No active offer right now. You can still book a demo class below.
-              </div>
+                <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-5 sm:p-8 text-center text-gray-500 flex items-center justify-center">
+                No active offer right now. You can still book a demo session below.
+                </div>
               {bookingCard}
             </div>
           )}

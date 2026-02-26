@@ -89,7 +89,7 @@ function VerifyCertificate() {
                   type="text"
                   value={searchId}
                   onChange={(e) => setSearchId(e.target.value.toUpperCase())}
-                  placeholder="LEARNIFY-YYYYMMDD-XXXXXX"
+                  placeholder="Learnify-YYYYMMDD-XXXXXX"
                   className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-[#3B82F6] transition-colors text-gray-900 font-mono"
                   required
                 />
@@ -101,7 +101,7 @@ function VerifyCertificate() {
                 </button>
               </div>
               <p className="text-sm text-gray-600">
-                Enter the Certificate ID found on the certificate (e.g., LEARNIFY-20241215-ABC123)
+                Enter the Certificate ID found on the certificate (e.g., Learnify-20241215-ABC123)
               </p>
             </form>
           </div>
@@ -245,4 +245,6 @@ function VerifyCertificate() {
 }
 
 export default VerifyCertificate;
+
+
 

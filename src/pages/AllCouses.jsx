@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import Card from "../components/Card.jsx";
 import { FaArrowLeftLong, FaFilter } from "react-icons/fa6";
-import { FaSearch, FaGraduationCap, FaBook, FaFlask, FaAtom, FaDna, FaCalculator, FaStethoscope, FaChalkboardTeacher, FaAward, FaTimes } from "react-icons/fa";
+import { FaSearch, FaGraduationCap, FaBook, FaCode, FaLaptopCode, FaDatabase, FaBrain, FaCloud, FaShieldAlt, FaMobileAlt, FaTimes } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import Nav from '../components/Nav';
 import ai from '../assets/SearchAi.png'
@@ -28,10 +28,8 @@ function AllCourses() {
   const applyFilter = () => {
     let courseCopy = courseData.slice();
 
-    // Filter by class (for students, show courses matching their class)
-    if (userData?.role === "student" && userData?.class) {
-      courseCopy = courseCopy.filter(item => item.class === userData.class)
-    } else if (selectedClass) {
+    // Optional branch filter
+    if (selectedClass) {
       courseCopy = courseCopy.filter(item => item.class === selectedClass)
     }
 
@@ -112,35 +110,45 @@ function AllCourses() {
           <img src={ai} className='w-6 h-6 rounded-full' alt="" />
         </button>
 
-        {/* Class Filter */}
-        {userData?.role !== "student" && (
+        {/* Branch Filter */}
+        {(
           <div className="mb-6 bg-white bg-opacity-10 rounded-xl p-4 border border-[#3B82F6] border-opacity-30">
             <label className="font-bold text-[#3B82F6] mb-3 flex items-center gap-2">
-              <FaGraduationCap /> Filter by Class
+              <FaGraduationCap /> Filter by Branch
             </label>
             <select
               className="w-full border-2 border-[#3B82F6] rounded-xl px-4 py-3 bg-black text-white font-semibold focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
             >
-              <option value="" className="bg-black">All Classes</option>
-              <option value="9th" className="bg-black">9th Grade</option>
-              <option value="10th" className="bg-black">10th Grade</option>
-              <option value="11th" className="bg-black">11th Grade</option>
-              <option value="12th" className="bg-black">12th Grade</option>
-              <option value="NEET Dropper" className="bg-black">NEET Dropper</option>
+              <option value="" className="bg-black">All Branches</option>
+              <option value="General" className="bg-black">General</option>
+              <option value="CSE" className="bg-black">CSE</option>
+              <option value="IT" className="bg-black">IT</option>
+              <option value="ECE" className="bg-black">ECE</option>
+              <option value="EEE" className="bg-black">EEE</option>
+              <option value="Mechanical" className="bg-black">Mechanical</option>
+              <option value="Civil" className="bg-black">Civil</option>
+              <option value="BCA" className="bg-black">BCA</option>
+              <option value="MCA" className="bg-black">MCA</option>
+              <option value="BBA" className="bg-black">BBA</option>
+              <option value="BCom" className="bg-black">BCom</option>
+              <option value="BA" className="bg-black">BA</option>
+              <option value="BSc" className="bg-black">BSc</option>
+              <option value="MBA" className="bg-black">MBA</option>
+              <option value="Other" className="bg-black">Other</option>
             </select>
           </div>
         )}
 
-        {/* Student Class Info */}
-        {userData?.role === "student" && userData?.class && (
+        {/* Student Branch Info */}
+        {userData?.class && (
           <div className="mb-6 bg-[#3B82F6] border-2 border-[#3B82F6] rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <FaGraduationCap className="text-black text-xl" />
-              <p className="font-bold text-black">Your Class: {userData.class}</p>
+              <p className="font-bold text-black">Preferred Branch: {userData.class}</p>
             </div>
-            <p className="text-black text-sm">Showing courses for your class</p>
+            <p className="text-black text-sm">Use filters to explore all language and technical courses.</p>
           </div>
         )}
 
@@ -151,13 +159,14 @@ function AllCourses() {
           </label>
           <div className="space-y-3">
             {[
-              { value: 'Physics', icon: <FaAtom /> },
-              { value: 'Chemistry', icon: <FaFlask /> },
-              { value: 'Biology', icon: <FaDna /> },
-              { value: 'Mathematics', icon: <FaCalculator /> },
-              { value: 'NEET Preparation', icon: <FaStethoscope /> },
-              { value: 'JEE Preparation', icon: <FaChalkboardTeacher /> },
-              { value: 'Board Exam Preparation', icon: <FaAward /> },
+              { value: 'Programming Fundamentals', icon: <FaCode /> },
+              { value: 'Data Structures', icon: <FaDatabase /> },
+              { value: 'Web Development', icon: <FaLaptopCode /> },
+              { value: 'Mobile Development', icon: <FaMobileAlt /> },
+              { value: 'AI/ML', icon: <FaBrain /> },
+              { value: 'Cloud & DevOps', icon: <FaCloud /> },
+              { value: 'Cybersecurity', icon: <FaShieldAlt /> },
+              { value: 'Language Learning', icon: <FaBook /> },
               { value: 'Others', icon: <FaBook /> }
             ].map((cat) => (
               <label

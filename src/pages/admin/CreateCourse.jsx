@@ -23,7 +23,7 @@ const CreateCourse = () => {
             return
         }
         if (!courseClass) {
-            toast.error("Class/Grade is required (9th, 10th, 11th, 12th, or NEET Dropper)")
+            toast.error("Branch is required")
             return
         }
         if (!subject.trim()) {
@@ -37,6 +37,7 @@ const CreateCourse = () => {
                 title, 
                 category,
                 class: courseClass,
+                branch: courseClass,
                 subject
             } , {withCredentials:true})
             console.log(result.data)
@@ -76,10 +77,10 @@ const CreateCourse = () => {
                         />
                     </div>
 
-                    {/* Class/Grade - Required */}
+                    {/* Branch - Required */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Class/Grade <span className="text-red-500">*</span>
+                            Branch / Department <span className="text-red-500">*</span>
                         </label>
                         <select
                             className="w-full border border-gray-300 rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[black]"
@@ -87,14 +88,24 @@ const CreateCourse = () => {
                             value={courseClass}
                             required
                         >
-                            <option value="">Select class</option>
-                            <option value="9th">9th Grade</option>
-                            <option value="10th">10th Grade</option>
-                            <option value="11th">11th Grade</option>
-                            <option value="12th">12th Grade</option>
-                            <option value="NEET Dropper">NEET Dropper</option>
+                            <option value="">Select branch</option>
+                            <option value="General">General</option>
+                            <option value="CSE">CSE</option>
+                            <option value="IT">IT</option>
+                            <option value="ECE">ECE</option>
+                            <option value="EEE">EEE</option>
+                            <option value="Mechanical">Mechanical</option>
+                            <option value="Civil">Civil</option>
+                            <option value="BCA">BCA</option>
+                            <option value="MCA">MCA</option>
+                            <option value="BBA">BBA</option>
+                            <option value="BCom">BCom</option>
+                            <option value="BA">BA</option>
+                            <option value="BSc">BSc</option>
+                            <option value="MBA">MBA</option>
+                            <option value="Other">Other</option>
                         </select>
-                        <p className="text-xs text-gray-500 mt-1">Learnify courses are organized by class (9th-12th) and NEET Dropper</p>
+                        <p className="text-xs text-gray-500 mt-1">Select course target branch (use General for all branches).</p>
                     </div>
 
                     {/* Subject - Required */}
@@ -104,7 +115,7 @@ const CreateCourse = () => {
                         </label>
                         <input
                             type="text"
-                            placeholder="e.g., Physics, Chemistry, Biology, Mathematics, etc."
+                            placeholder="e.g., JavaScript, Python, German, Communication Skills"
                             className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[black]"
                             onChange={(e)=>setSubject(e.target.value)}
                             value={subject}
@@ -124,13 +135,15 @@ const CreateCourse = () => {
                             required
                         >
                             <option value="">Select category</option>
-                            <option value="Physics">Physics</option>
-                            <option value="Chemistry">Chemistry</option>
-                            <option value="Biology">Biology</option>
-                            <option value="Mathematics">Mathematics</option>
-                            <option value="NEET Preparation">NEET Preparation</option>
-                            <option value="JEE Preparation">JEE Preparation</option>
-                            <option value="Board Exam Preparation">Board Exam Preparation</option>
+                            <option value="Programming Fundamentals">Programming Fundamentals</option>
+                            <option value="Data Structures">Data Structures</option>
+                            <option value="Web Development">Web Development</option>
+                            <option value="Mobile Development">Mobile Development</option>
+                            <option value="AI/ML">AI/ML</option>
+                            <option value="Data Science">Data Science</option>
+                            <option value="Cloud & DevOps">Cloud & DevOps</option>
+                            <option value="Cybersecurity">Cybersecurity</option>
+                            <option value="Language Learning">Language Learning</option>
                             <option value="Others">Others</option>
                         </select>
                     </div>

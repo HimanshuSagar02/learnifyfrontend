@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const TOKEN_STORAGE_KEY = "learnify_auth_token";
+const TOKEN_STORAGE_KEY = "Learnify_auth_token";
 
 const hasWindow = () => typeof window !== "undefined";
 const isDev = typeof import.meta !== "undefined" && Boolean(import.meta.env?.DEV);
@@ -51,3 +51,5 @@ export const initializeAuthToken = () => {
   }
   return token;
 };
+
+

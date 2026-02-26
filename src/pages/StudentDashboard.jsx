@@ -625,7 +625,7 @@ const formatCurrency = (value) =>
                 </h1>
                 {userData?.class && (
                   <span className="inline-block px-4 py-1 bg-[#3B82F6] text-black rounded-full text-sm font-semibold mb-2">
-                    {userData.class} Grade
+                    {userData.class} Branch
                   </span>
                 )}
               </div>
@@ -1973,4 +1973,6 @@ const formatCurrency = (value) =>
 }
 
 export default StudentDashboard;
+
+
 

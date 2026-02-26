@@ -10,7 +10,7 @@ const defaultContent = {
     title: "",
     description: "",
     imageUrl: "",
-    ctaLabel: "Book Demo Class",
+    ctaLabel: "Book Demo Session",
     ctaLink: "",
     expiresAt: "",
     isActive: true,
@@ -278,7 +278,7 @@ function MarketingManager() {
                     currentOffer: { ...prev.currentOffer, ctaLabel: e.target.value },
                   }))
                 }
-                placeholder="CTA label (e.g. Book Demo Class)"
+                placeholder="CTA label (e.g. Book Demo Session)"
                 className="w-full border rounded-lg px-3 py-2"
               />
               <input
@@ -398,7 +398,7 @@ function MarketingManager() {
 
           <div className="bg-white rounded-xl shadow-lg p-4 sm:p-5 border border-gray-200 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <h4 className="text-lg font-semibold">Demo Class Bookings</h4>
+              <h4 className="text-lg font-semibold">Demo Session Bookings</h4>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -435,7 +435,7 @@ function MarketingManager() {
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <p className="font-semibold text-gray-900">{booking.name}</p>
-                          <p className="text-xs text-gray-500">{booking.className || "-"}</p>
+                          <p className="text-xs text-gray-500">Branch: {booking.className || "-"}</p>
                         </div>
                         <select
                           value={booking.status}
@@ -466,7 +466,7 @@ function MarketingManager() {
                       <tr>
                         <th className="text-left px-3 py-2">Name</th>
                         <th className="text-left px-3 py-2">Contact</th>
-                        <th className="text-left px-3 py-2">Class</th>
+                        <th className="text-left px-3 py-2">Branch</th>
                         <th className="text-left px-3 py-2">Preferred Date</th>
                         <th className="text-left px-3 py-2">Message</th>
                         <th className="text-left px-3 py-2">Status</th>

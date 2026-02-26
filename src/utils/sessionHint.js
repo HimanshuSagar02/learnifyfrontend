@@ -1,4 +1,4 @@
-const SESSION_HINT_KEY = "learnify_has_session";
+const SESSION_HINT_KEY = "Learnify_has_session";
 
 const hasWindow = () => typeof window !== "undefined";
 const isDev = typeof import.meta !== "undefined" && Boolean(import.meta.env?.DEV);
@@ -27,3 +27,5 @@ export const markSessionHint = () => {
 export const clearSessionHint = () => {
   withSafeStorage((storage) => storage.removeItem(SESSION_HINT_KEY));
 };
+
+

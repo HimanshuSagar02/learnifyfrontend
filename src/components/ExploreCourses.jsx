@@ -1,18 +1,17 @@
 import React from "react";
 import { SiViaplay } from "react-icons/si";
-import { FaAtom, FaFlask, FaDna, FaCalculator, FaChalkboardTeacher, FaBrain } from "react-icons/fa";
-import { GiTargetArrows, GiNotebook } from "react-icons/gi";
+import { FaCode, FaLaptopCode, FaMobileAlt, FaDatabase, FaBrain, FaCloud, FaShieldAlt, FaTools } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const categories = [
-  { label: "Physics", icon: <FaAtom className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
-  { label: "Chemistry", icon: <FaFlask className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
-  { label: "Biology", icon: <FaDna className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
-  { label: "Mathematics", icon: <FaCalculator className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
-  { label: "NEET Strategy", icon: <GiTargetArrows className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
-  { label: "JEE Strategy", icon: <FaBrain className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
-  { label: "Board Revision", icon: <GiNotebook className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
-  { label: "Mentor Sessions", icon: <FaChalkboardTeacher className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
+  { label: "Programming Fundamentals", icon: <FaCode className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
+  { label: "Web Development", icon: <FaLaptopCode className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
+  { label: "Mobile Development", icon: <FaMobileAlt className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
+  { label: "Data Structures", icon: <FaDatabase className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
+  { label: "AI/ML", icon: <FaBrain className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
+  { label: "Cloud & DevOps", icon: <FaCloud className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
+  { label: "Cybersecurity", icon: <FaShieldAlt className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
+  { label: "Language Learning", icon: <FaTools className="w-[44px] h-[44px] text-[#1D4ED8]" /> },
 ];
 
 function ExploreCourses() {
@@ -21,9 +20,9 @@ function ExploreCourses() {
   return (
     <section className="w-full min-h-[50vh] flex flex-col lg:flex-row items-center justify-center gap-6 px-4 sm:px-5 md:px-6 py-6">
       <div className="w-full lg:w-[360px] max-w-xl flex flex-col items-start justify-center gap-3 md:px-4">
-        <span className="text-2xl sm:text-3xl font-semibold leading-tight">Explore Our Tracks</span>
+        <span className="text-2xl sm:text-3xl font-semibold leading-tight">Explore Courses by Domain</span>
         <p className="text-sm sm:text-base text-gray-700">
-          Structured paths for 9th to 12th and competitive prep with concept videos, tests and revision support.
+          Structured technical paths with concept clarity, hands-on projects and mentor-backed growth.
         </p>
         <button
           className="px-5 py-2.5 border-2 bg-black border-[#3B82F6] text-[#3B82F6] rounded-[10px] text-sm sm:text-base font-semibold flex gap-2 mt-3 hover:bg-[#3B82F6] hover:text-black transition-all"

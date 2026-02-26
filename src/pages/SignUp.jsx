@@ -42,10 +42,6 @@ function SignUp() {
             toast.error("Password must be at least 8 characters")
             return
         }
-        if (!studentClass) {
-            toast.error("Please select your class/grade (Mandatory)")
-            return
-        }
         
         setLoading(true)
         try {
@@ -56,6 +52,7 @@ function SignUp() {
                 password, 
                 role: "student", // Force student role
                 class: studentClass,
+                branch: studentClass,
                 subject: subject
             }, {withCredentials: true})
             const authToken = extractAuthToken(result.data)
@@ -85,13 +82,6 @@ function SignUp() {
                 return
             }
             
-            // For Google signup, class is required for students
-            if (!studentClass) {
-                toast.error("Please select your class/grade (Mandatory for students)")
-                setGoogleLoading(false)
-                return
-            }
-            
             const response = await signInWithPopup(auth, provider)
             
             let user = response.user
@@ -112,6 +102,7 @@ function SignUp() {
                 role: "student", // Force student role
                 photoUrl,
                 class: studentClass,
+                branch: studentClass,
                 subject: subject
             }, {withCredentials: true})
             const authToken = extractAuthToken(result.data)
@@ -169,7 +160,7 @@ function SignUp() {
                             </div>
                             <div>
                                 <h1 className='text-2xl sm:text-3xl font-bold text-gray-900'>Create Account</h1>
-                                <p className='text-sm sm:text-base text-gray-600'>Join Learnify</p>
+                                <p className='text-sm sm:text-base text-gray-600'>Join Learnify Technical Learning</p>
                             </div>
                         </div>
                     </div>
@@ -179,10 +170,10 @@ function SignUp() {
                         <div className='flex items-start gap-3'>
                             <FaGraduationCap className='text-blue-600 text-xl mt-0.5 flex-shrink-0' />
                             <div>
-                                <p className='font-semibold text-blue-900 mb-1'>Student Sign Up</p>
+                                <p className='font-semibold text-blue-900 mb-1'>Learner Sign Up</p>
                                 <p className='text-sm text-blue-700'>
-                                    Only students can create accounts here. Teachers/Educators are created by administrators. 
-                                    If you are a teacher, please contact your administrator or use the login page if you already have an account.
+                                    Learner accounts are created here. Educator and admin accounts are created by administrators.
+                                    If you are a mentor, please contact your administrator or use login if you already have access.
                                 </p>
                             </div>
                         </div>
@@ -262,24 +253,33 @@ function SignUp() {
 
                         {/* Student-specific fields */}
                         <>
-                            {/* Class Selection */}
+                            {/* Branch Selection */}
                             <div>
                                 <label htmlFor="class" className='block text-sm font-semibold text-gray-700 mb-2'>
-                                    Class/Grade <span className='text-red-500'>*</span> <span className='text-xs font-normal text-gray-500'>(Mandatory)</span>
+                                    Branch / Department <span className='text-xs font-normal text-gray-500'>(Optional)</span>
                                 </label>
                                 <select 
                                     id='class' 
                                     className='w-full h-12 px-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-[#3B82F6] transition-colors text-gray-900 bg-white' 
                                     value={studentClass}
                                     onChange={(e) => setStudentClass(e.target.value)}
-                                    required
                                 >
-                                    <option value="">Select your class</option>
-                                    <option value="9th">9th Grade</option>
-                                    <option value="10th">10th Grade</option>
-                                    <option value="11th">11th Grade</option>
-                                    <option value="12th">12th Grade</option>
-                                    <option value="NEET Dropper">NEET Dropper</option>
+                                    <option value="">Select your branch</option>
+                                    <option value="General">General</option>
+                                    <option value="CSE">CSE</option>
+                                    <option value="IT">IT</option>
+                                    <option value="ECE">ECE</option>
+                                    <option value="EEE">EEE</option>
+                                    <option value="Mechanical">Mechanical</option>
+                                    <option value="Civil">Civil</option>
+                                    <option value="BCA">BCA</option>
+                                    <option value="MCA">MCA</option>
+                                    <option value="BBA">BBA</option>
+                                    <option value="BCom">BCom</option>
+                                    <option value="BA">BA</option>
+                                    <option value="BSc">BSc</option>
+                                    <option value="MBA">MBA</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
 
@@ -292,7 +292,7 @@ function SignUp() {
                                     id='subject' 
                                     type="text" 
                                     className='w-full h-12 px-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-[#3B82F6] transition-colors text-gray-900' 
-                                    placeholder='e.g., Physics, Chemistry, Biology, Mathematics'
+                                    placeholder='e.g., Data Structures, React, Spanish, German'
                                     value={subject}
                                     onChange={(e) => setSubject(e.target.value)}
                                 />
@@ -305,8 +305,8 @@ function SignUp() {
                                     <div>
                                         <p className='font-bold text-gray-900 mb-1'>About Learnify</p>
                                         <p className='text-sm text-gray-700'>
-                                            Learnify is specifically designed for <strong>9th to 12th grade students</strong> and <strong>NEET droppers</strong>. 
-                                            All courses are organized by class and subject to help you excel in your studies.
+                                            Learnify is built for <strong>language and technical skill development</strong>.
+                                            Courses cover web development, data structures, AI/ML, communication, and global languages.
                                         </p>
                                     </div>
                                 </div>
@@ -376,15 +376,15 @@ function SignUp() {
                     <div className='relative z-10'>
                         <img src={logo} className='w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto mb-4 md:mb-6 rounded-xl sm:rounded-2xl border-4 border-[#3B82F6] shadow-2xl' alt="Learnify Logo" />
                         <h2 className='text-3xl sm:text-4xl md:text-5xl font-bold text-[#3B82F6] mb-2 md:mb-3'>Learnify</h2>
-                        <p className='text-base sm:text-lg md:text-xl text-white mb-4 md:mb-6 font-semibold'>Learnify</p>
+                        <p className='text-base sm:text-lg md:text-xl text-white mb-4 md:mb-6 font-semibold'>Technical Learning Platform</p>
                         <div className='bg-black bg-opacity-50 rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 border border-[#3B82F6] border-opacity-30'>
                             <p className='text-white text-sm leading-relaxed mb-4'>
-                                Your premier learning platform for <strong className='text-[#3B82F6]'>9th to 12th grade</strong> students and <strong className='text-[#3B82F6]'>NEET droppers</strong>
+                                Your learning platform for <strong className='text-[#3B82F6]'>software and technical skills</strong> with guided paths and real-world projects.
                             </p>
                             <div className='flex flex-wrap gap-2 justify-center'>
-                                <span className='px-3 py-1 bg-[#3B82F6] text-black rounded-full text-xs font-semibold'>9th-12th Grade</span>
-                                <span className='px-3 py-1 bg-[#3B82F6] text-black rounded-full text-xs font-semibold'>NEET Prep</span>
-                                <span className='px-3 py-1 bg-[#3B82F6] text-black rounded-full text-xs font-semibold'>Subject-Based</span>
+                                <span className='px-3 py-1 bg-[#3B82F6] text-black rounded-full text-xs font-semibold'>Data Structures</span>
+                                <span className='px-3 py-1 bg-[#3B82F6] text-black rounded-full text-xs font-semibold'>Web Development</span>
+                                <span className='px-3 py-1 bg-[#3B82F6] text-black rounded-full text-xs font-semibold'>AI/ML</span>
                             </div>
                         </div>
                     </div>
@@ -395,3 +395,5 @@ function SignUp() {
 }
 
 export default SignUp
+
+

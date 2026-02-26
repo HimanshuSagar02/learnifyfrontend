@@ -242,7 +242,7 @@ function AdminFeedback() {
                         {feedback.isAnonymous
                           ? "Anonymous"
                           : feedback.studentId?.name || "Unknown"}
-                        {feedback.studentId?.class && ` (${feedback.studentId.class})`}
+                        {feedback.studentId?.class && ` (Branch: ${feedback.studentId.class})`}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
                         {new Date(feedback.createdAt).toLocaleString()}
@@ -344,4 +344,5 @@ function AdminFeedback() {
 }
 
 export default AdminFeedback;
+
 

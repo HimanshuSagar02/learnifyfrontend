@@ -15,7 +15,15 @@ import DashboardMarketingPanel from "../components/DashboardMarketingPanel";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-const classPills = ["9th", "10th", "11th", "12th", "NEET Dropper"];
+const classPills = [
+  "DSA",
+  "Web Development",
+  "AI/ML",
+  "Data Science",
+  "Cloud & DevOps",
+  "Cybersecurity",
+  "Language Learning",
+];
 
 function Home() {
   const navigate = useNavigate();
@@ -24,7 +32,7 @@ function Home() {
   const stats = [
     { label: "Total Courses", value: 120 },
     { label: "Published Courses", value: 112 },
-    { label: "Subjects Covered", value: 24 },
+    { label: "Tech Domains Covered", value: 24 },
     { label: "Learner Reviews", value: 4800 },
   ];
 
@@ -37,13 +45,13 @@ function Home() {
 
         <div className="absolute top-[17%] md:top-[22%] left-0 right-0 px-4 md:px-10 text-center">
           <h1 className="lg:text-[68px] md:text-[52px] sm:text-[34px] text-[26px] text-[#3B82F6] font-extrabold leading-tight drop-shadow-2xl">
-            Exam Ready Learning
+            Build Real Tech Skills
           </h1>
           <h2 className="lg:text-[60px] md:text-[44px] sm:text-[28px] text-[22px] text-white font-bold drop-shadow-2xl">
-            For Board & Competitive Students
+            For Developers, Engineers and Career Switchers
           </h2>
           <p className="max-w-3xl mx-auto mt-4 text-white/90 text-sm md:text-base">
-            Structured courses, mentor guidance, assignment tracking and AI doubt support in one platform.
+            Learn technical domains and language courses with project-based modules, mentor support and AI guidance.
           </p>
 
           <div className="mt-6 flex items-center justify-center gap-3 sm:gap-4 flex-wrap">
@@ -51,7 +59,7 @@ function Home() {
               className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 bg-[#3B82F6] text-black font-bold rounded-lg sm:rounded-xl text-sm sm:text-base flex gap-2 cursor-pointer items-center justify-center hover:bg-[#2563EB] transition-all shadow-lg"
               onClick={() => navigate("/allcourses")}
             >
-              View all Courses <SiViaplay className="w-[20px] h-[20px] fill-black" />
+              Explore Tech Courses <SiViaplay className="w-[20px] h-[20px] fill-black" />
             </button>
             <button
               className="px-4 sm:px-6 md:px-8 py-2 sm:py-3 border-2 border-[#3B82F6] bg-black/40 text-[#3B82F6] font-bold rounded-lg sm:rounded-xl text-sm sm:text-base flex gap-2 cursor-pointer items-center justify-center hover:bg-[#3B82F6] hover:text-black transition-all shadow-lg backdrop-blur-sm"
@@ -105,3 +113,5 @@ function Home() {
 }
 
 export default Home;
+
+
