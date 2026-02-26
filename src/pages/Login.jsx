@@ -23,6 +23,14 @@ function Login() {
     const [loading, setLoading] = useState(false)
     const [googleLoading, setGoogleLoading] = useState(false)
     const dispatch = useDispatch()
+    const finalizeLogin = (user) => {
+        dispatch(setUserData(user))
+        markSessionHint()
+        setTimeout(() => {
+            navigate("/")
+            toast.success("Login Successfully")
+        }, 100)
+    }
 
     const handleLogin = async () => {
         if (!email.trim()) {
@@ -42,20 +50,38 @@ function Login() {
                 { withCredentials: true }
             )
 
-            const authUser = extractAuthUser(result.data)
-
-            if (authUser) {
-                dispatch(setUserData(authUser))
-                markSessionHint()
-                
-                setTimeout(() => {
-                    navigate("/")
-                    toast.success("Login Successfully")
-                }, 100);
-            } else {
-                throw new Error(result?.data?.message || "Invalid response from server")
+            const directUser = extractAuthUser(result.data)
+            if (directUser) {
+                finalizeLogin(directUser)
+                setLoading(false)
+                return
             }
-            setLoading(false)
+
+            // Fallback: some deployments return a success envelope without user data.
+            const sessionResult = await axios.get(`${serverUrl}/api/user/currentuser`, {
+                withCredentials: true,
+                timeout: 10000,
+            })
+            const sessionUser = extractAuthUser(sessionResult.data)
+
+            if (sessionUser) {
+                finalizeLogin(sessionUser)
+                setLoading(false)
+                return
+            }
+
+            if (import.meta.env.DEV) {
+                console.error("[Login] Unexpected response payload", {
+                    loginResponse: result.data,
+                    currentUserResponse: sessionResult.data,
+                })
+            }
+
+            throw new Error(
+                result?.data?.message ||
+                sessionResult?.data?.message ||
+                "Login succeeded but user session was not created"
+            )
         } catch (error) {
             setLoading(false)
             
