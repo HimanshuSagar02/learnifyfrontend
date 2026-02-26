@@ -41,10 +41,22 @@ const VerifyCertificate = lazy(() => import('./pages/VerifyCertificate'))
 const MyCertificates = lazy(() => import('./pages/MyCertificates'))
 const AIAssistant = lazy(() => import('./components/AIAssistant'))
 
-// Use environment variable for server URL, fallback to localhost for development
-// If VITE_SERVER_URL is not set, use localhost backend for local development
+const normalizeServerUrl = (value) => {
+  const trimmed = (value || "").trim();
+  if (!trimmed) return "";
+
+  const withProtocol = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`;
+
+  return withProtocol.replace(/\/+$/, "");
+};
+
+// Use environment variable for server URL, fallback to localhost for development.
+// This guard prevents malformed URLs when env value misses http/https.
 // eslint-disable-next-line react-refresh/only-export-components
-export const serverUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:8000"
+export const serverUrl =
+  normalizeServerUrl(import.meta.env.VITE_SERVER_URL) || "http://localhost:8000"
 
 if (import.meta.env.DEV && typeof window !== 'undefined') {
     console.log("[App] Backend Server URL:", serverUrl);

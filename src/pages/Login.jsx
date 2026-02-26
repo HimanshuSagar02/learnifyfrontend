@@ -24,6 +24,7 @@ function Login() {
     const [loading, setLoading] = useState(false)
     const [googleLoading, setGoogleLoading] = useState(false)
     const dispatch = useDispatch()
+    const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
     const finalizeLogin = (user) => {
         dispatch(setUserData(user))
         markSessionHint()
@@ -31,6 +32,34 @@ function Login() {
             navigate("/")
             toast.success("Login Successfully")
         }, 100)
+    }
+    const fetchSessionUserWithRetry = async (token = "", tries = 3) => {
+        let lastPayload = null
+
+        for (let attempt = 0; attempt < tries; attempt += 1) {
+            const response = await axios.get(`${serverUrl}/api/user/currentuser`, {
+                withCredentials: true,
+                timeout: 10000,
+                headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+            })
+            lastPayload = response.data
+
+            const user = extractAuthUser(response.data)
+            if (user) {
+                return {
+                    user,
+                    token: extractAuthToken(response.data),
+                    payload: response.data,
+                }
+            }
+
+            // Some browsers/proxies apply Set-Cookie right after the first response cycle.
+            if (attempt < tries - 1) {
+                await wait(350)
+            }
+        }
+
+        return { user: null, token: "", payload: lastPayload }
     }
 
     const handleLogin = async () => {
@@ -63,14 +92,11 @@ function Login() {
             }
 
             // Fallback: some deployments return a success envelope without user data.
-            const sessionResult = await axios.get(`${serverUrl}/api/user/currentuser`, {
-                withCredentials: true,
-                timeout: 10000,
-            })
-            const sessionUser = extractAuthUser(sessionResult.data)
+            const sessionResult = await fetchSessionUserWithRetry(loginToken, 3)
+            const sessionUser = sessionResult.user
 
             if (sessionUser) {
-                const sessionToken = extractAuthToken(sessionResult.data)
+                const sessionToken = sessionResult.token
                 if (sessionToken) {
                     setAuthToken(sessionToken)
                 }
@@ -82,13 +108,13 @@ function Login() {
             if (import.meta.env.DEV) {
                 console.error("[Login] Unexpected response payload", {
                     loginResponse: result.data,
-                    currentUserResponse: sessionResult.data,
+                    currentUserResponse: sessionResult.payload,
                 })
             }
 
             throw new Error(
                 result?.data?.message ||
-                sessionResult?.data?.message ||
+                sessionResult?.payload?.message ||
                 "Login succeeded but user session was not created"
             )
         } catch (error) {
