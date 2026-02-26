@@ -12,8 +12,10 @@ const hostname = isBrowser ? window.location.hostname : ''
 const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1'
 const routerMode = String(import.meta.env.VITE_ROUTER_MODE || '').toLowerCase()
 const allowBrowserRouterInProd = String(import.meta.env.VITE_ALLOW_BROWSER_ROUTER_PROD || '').toLowerCase() === 'true'
+const isAuthPath = isBrowser && /^\/(login|signup)\/?$/i.test(window.location.pathname)
 
 const shouldUseHashRouter =
+  (!isLocalhost && isAuthPath) ||
   routerMode === 'hash' ||
   (
     routerMode === 'browser'
