@@ -73,8 +73,22 @@ function MarketingManager() {
   const fetchMarketingContent = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${serverUrl}/api/marketing/admin/content`, { withCredentials: true });
-      const data = res.data || defaultContent;
+      let data = null;
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        try {
+          const res = await axios.get(`${serverUrl}/api/marketing/admin/content`, { withCredentials: true });
+          if (typeof res.data === "string" && !res.data.trim()) {
+            throw new Error("Empty API response");
+          }
+          data = res.data || defaultContent;
+          break;
+        } catch (error) {
+          if (attempt === 1) throw error;
+          await new Promise((resolve) => setTimeout(resolve, 700));
+        }
+      }
+
+      data = data || defaultContent;
       setContent({
         ...defaultContent,
         ...data,

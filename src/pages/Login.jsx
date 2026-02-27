@@ -74,11 +74,18 @@ function Login() {
 
         setLoading(true)
         try {
+            const normalizedEmail = email.trim().toLowerCase()
             const result = await axios.post(
                 `${serverUrl}/api/auth/login`,
-                { email: email.trim(), password },
+                { email: normalizedEmail, password },
                 { withCredentials: true }
             )
+
+            if (typeof result?.data === "string" && !result.data.trim()) {
+                throw new Error(
+                    "Server returned an empty login response. Please verify API gateway/proxy configuration."
+                )
+            }
             const loginToken = extractAuthToken(result.data)
             if (loginToken) {
                 setAuthToken(loginToken)

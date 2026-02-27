@@ -54,24 +54,39 @@ const normalizeServerUrl = (value) => {
 
 const getApiBaseUrl = () => {
   const configuredUrl = normalizeServerUrl(import.meta.env.VITE_SERVER_URL);
+  const fallbackRemoteUrl = normalizeServerUrl(
+    import.meta.env.VITE_BACKEND_FALLBACK_URL || import.meta.env.VITE_REMOTE_SERVER_URL
+  );
 
   if (typeof window === "undefined") {
-    return configuredUrl || "http://localhost:8000";
+    return configuredUrl || fallbackRemoteUrl || "http://localhost:8000";
   }
 
   const host = String(window.location.hostname || "").toLowerCase();
   const isLocalhost = host === "localhost" || host === "127.0.0.1";
   const sameOriginUrl = normalizeServerUrl(window.location.origin);
 
-  // In production, prefer same-origin API unless env explicitly forces remote backend.
+  // In production, prefer configured API and allow explicit remote override.
   const forceRemote =
     String(import.meta.env.VITE_FORCE_REMOTE_API || "").toLowerCase() === "true";
 
-  if (import.meta.env.PROD && !isLocalhost && !forceRemote) {
-    return sameOriginUrl || configuredUrl || "http://localhost:8000";
+  if (import.meta.env.PROD && !isLocalhost) {
+    if (forceRemote) {
+      return configuredUrl || fallbackRemoteUrl || sameOriginUrl || "http://localhost:8000";
+    }
+
+    const configuredIsSameOrigin =
+      Boolean(configuredUrl) && configuredUrl.toLowerCase() === sameOriginUrl.toLowerCase();
+
+    // If configured URL points to same origin but a remote fallback exists, prefer fallback.
+    if (configuredIsSameOrigin && fallbackRemoteUrl) {
+      return fallbackRemoteUrl;
+    }
+
+    return configuredUrl || sameOriginUrl || fallbackRemoteUrl || "http://localhost:8000";
   }
 
-  return configuredUrl || (isLocalhost ? "http://localhost:8000" : sameOriginUrl);
+  return configuredUrl || fallbackRemoteUrl || (isLocalhost ? "http://localhost:8000" : sameOriginUrl);
 };
 
 // Use environment variable for server URL, fallback to localhost for development.

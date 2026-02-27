@@ -31,18 +31,37 @@ function AboutTabsPanel() {
     const fetchMarketingContent = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${serverUrl}/api/marketing/public`, { withCredentials: true });
-        const data = res.data || {};
-        setContent({
-          aboutProject: {
-            ...defaultContent.aboutProject,
-            ...(data.aboutProject || {}),
-            highlights: Array.isArray(data.aboutProject?.highlights)
-              ? data.aboutProject.highlights
-              : defaultContent.aboutProject.highlights,
-          },
-          teamMembers: Array.isArray(data.teamMembers) ? data.teamMembers : [],
-        });
+        let loaded = false;
+        for (let attempt = 0; attempt < 2; attempt += 1) {
+          try {
+            const res = await axios.get(`${serverUrl}/api/marketing/public`, { withCredentials: true });
+            const data = res.data;
+            if (typeof data === "string" && !data.trim()) {
+              throw new Error("Empty API response");
+            }
+
+            const safeData = data || {};
+            setContent({
+              aboutProject: {
+                ...defaultContent.aboutProject,
+                ...(safeData.aboutProject || {}),
+                highlights: Array.isArray(safeData.aboutProject?.highlights)
+                  ? safeData.aboutProject.highlights
+                  : defaultContent.aboutProject.highlights,
+              },
+              teamMembers: Array.isArray(safeData.teamMembers) ? safeData.teamMembers : [],
+            });
+            loaded = true;
+            break;
+          } catch (error) {
+            if (attempt === 1) throw error;
+            await new Promise((resolve) => setTimeout(resolve, 700));
+          }
+        }
+
+        if (!loaded) {
+          setContent(defaultContent);
+        }
       } catch {
         setContent(defaultContent);
       } finally {

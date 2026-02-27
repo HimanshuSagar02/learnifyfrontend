@@ -11,7 +11,17 @@ const getRequestErrorMessage = (error, fallbackMessage) => {
   if (error?.code === "ECONNABORTED") {
     return "Request timeout. Please try again.";
   }
-  return error?.response?.data?.message || error?.message || fallbackMessage;
+  const data = error?.response?.data;
+  if (typeof data === "string") {
+    if (!data.trim()) {
+      return "Server returned empty response. Please check API configuration and try again.";
+    }
+    return data;
+  }
+  if (data && typeof data === "object") {
+    return data.message || data.error || data.hint || error?.message || fallbackMessage;
+  }
+  return error?.message || fallbackMessage;
 };
 
 function ForgotPassword() {
@@ -33,9 +43,10 @@ function ForgotPassword() {
     setLoading(true)
     try {
       console.log("[ForgotPassword] Sending OTP to:", email);
+      const normalizedEmail = email.trim().toLowerCase();
       const result = await axios.post(
         `${serverUrl}/api/auth/sendotp`,
-        { email },
+        { email: normalizedEmail },
         { withCredentials: false, timeout: REQUEST_TIMEOUT_MS }
       )
       console.log("[ForgotPassword] OTP response:", result.data);
@@ -71,9 +82,10 @@ function ForgotPassword() {
     setLoading(true)
     try {
       console.log("[ForgotPassword] Verifying OTP for:", email);
+      const normalizedEmail = email.trim().toLowerCase();
       const result = await axios.post(
         `${serverUrl}/api/auth/verifyotp`,
-        { email, otp },
+        { email: normalizedEmail, otp },
         { withCredentials: false, timeout: REQUEST_TIMEOUT_MS }
       )
       console.log("[ForgotPassword] OTP verified successfully:", result.data);
@@ -107,9 +119,10 @@ function ForgotPassword() {
     setLoading(true)
     try {
       console.log("[ForgotPassword] Resetting password for:", email);
+      const normalizedEmail = email.trim().toLowerCase();
       const result = await axios.post(
         `${serverUrl}/api/auth/resetpassword`,
-        { email, password: newpassword },
+        { email: normalizedEmail, password: newpassword },
         { withCredentials: false, timeout: REQUEST_TIMEOUT_MS }
       )
       console.log("[ForgotPassword] Password reset successfully:", result.data);
