@@ -43,7 +43,6 @@ const defaultAboutForm = {
   subheadline: "",
   description: "",
   highlightsText: "",
-  imageUrl: "",
   isActive: true,
 };
 
@@ -105,7 +104,6 @@ function MarketingManager() {
         highlightsText: Array.isArray(data.aboutProject?.highlights)
           ? data.aboutProject.highlights.join("\n")
           : "",
-        imageUrl: data.aboutProject?.imageUrl || "",
         isActive: data.aboutProject?.isActive !== false,
       });
     } catch {
@@ -316,7 +314,6 @@ function MarketingManager() {
           subheadline: aboutForm.subheadline,
           description: aboutForm.description,
           highlights,
-          imageUrl: aboutForm.imageUrl,
           isActive: aboutForm.isActive,
         },
         { withCredentials: true }
@@ -520,23 +517,14 @@ function MarketingManager() {
               placeholder="Highlights (one per line or comma separated)"
               className="w-full border rounded-lg px-3 py-2 min-h-[90px]"
             />
-            <div className="grid sm:grid-cols-2 gap-3">
+            <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
               <input
-                type="url"
-                value={aboutForm.imageUrl}
-                onChange={(e) => setAboutForm((prev) => ({ ...prev, imageUrl: e.target.value }))}
-                placeholder="Image URL (optional)"
-                className="w-full border rounded-lg px-3 py-2"
+                type="checkbox"
+                checked={aboutForm.isActive !== false}
+                onChange={(e) => setAboutForm((prev) => ({ ...prev, isActive: e.target.checked }))}
               />
-              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                <input
-                  type="checkbox"
-                  checked={aboutForm.isActive !== false}
-                  onChange={(e) => setAboutForm((prev) => ({ ...prev, isActive: e.target.checked }))}
-                />
-                About section active
-              </label>
-            </div>
+              About section active
+            </label>
             <button
               type="submit"
               disabled={savingAbout}
@@ -637,7 +625,7 @@ function MarketingManager() {
               <img
                 src={content.currentOffer.imageUrl}
                 alt="Current offer"
-                className="w-full sm:w-80 h-44 object-cover rounded-lg border"
+                className="w-full sm:w-80 max-h-72 object-contain rounded-lg border bg-gray-50 p-1"
               />
             )}
           </form>
@@ -672,7 +660,11 @@ function MarketingManager() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
                 {content.gallery.map((item) => (
                   <div key={item._id} className="border rounded-lg overflow-hidden">
-                    <img src={item.imageUrl} alt={item.caption || "Gallery"} className="w-full h-40 object-cover" />
+                    <img
+                      src={item.imageUrl}
+                      alt={item.caption || "Gallery"}
+                      className="w-full max-h-64 object-contain bg-white"
+                    />
                     <div className="p-3 space-y-2">
                       <input
                         type="text"
@@ -832,7 +824,7 @@ function MarketingManager() {
                         <img
                           src={member.imageUrl}
                           alt={member.name || "Team member"}
-                          className="w-14 h-14 rounded-full object-cover border border-gray-300"
+                          className="w-20 h-20 rounded-lg object-contain bg-white border border-gray-300 p-1"
                         />
                       )}
                       <label className="w-full border rounded px-2 py-1.5 bg-white text-sm text-gray-700 cursor-pointer hover:bg-gray-100 flex items-center justify-between gap-2">

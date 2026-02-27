@@ -90,46 +90,31 @@ function AboutTabsPanel() {
         {loading ? (
           <div className="text-center py-8 text-gray-500">Loading section...</div>
         ) : activeTab === "about" ? (
-          <div className="grid lg:grid-cols-[1.2fr,0.8fr] gap-5 items-center">
-            <div className="space-y-3">
-              <p className="text-sm uppercase tracking-wider text-[#3B82F6] font-semibold">
-                {about.badgeTitle || "About Project"}
-              </p>
-              <h2 className="text-2xl md:text-4xl font-bold text-gray-900 leading-tight">
-                {about.headline || defaultContent.aboutProject.headline}
-              </h2>
-              <p className="text-base md:text-lg text-gray-700 font-medium">
-                {about.subheadline || defaultContent.aboutProject.subheadline}
-              </p>
-              <p className="text-sm md:text-base text-gray-600">
-                {about.description || defaultContent.aboutProject.description}
-              </p>
-              {Array.isArray(about.highlights) && about.highlights.length > 0 && (
-                <div className="grid sm:grid-cols-2 gap-2 pt-1">
-                  {about.highlights.map((item, idx) => (
-                    <div
-                      key={`${item}-${idx}`}
-                      className="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-700"
-                    >
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="h-full">
-              {about.imageUrl ? (
-                <img
-                  src={about.imageUrl}
-                  alt={about.headline || "About Project"}
-                  className="w-full h-56 md:h-72 object-cover rounded-xl border border-gray-200"
-                />
-              ) : (
-                <div className="w-full h-56 md:h-72 rounded-xl border border-dashed border-gray-300 bg-white/70 flex items-center justify-center text-gray-400 text-sm">
-                  Add about image from Admin Portal
-                </div>
-              )}
-            </div>
+          <div className="space-y-3">
+            <p className="text-sm uppercase tracking-wider text-[#3B82F6] font-semibold">
+              {about.badgeTitle || "About Project"}
+            </p>
+            <h2 className="text-2xl md:text-4xl font-bold text-gray-900 leading-tight">
+              {about.headline || defaultContent.aboutProject.headline}
+            </h2>
+            <p className="text-base md:text-lg text-gray-700 font-medium">
+              {about.subheadline || defaultContent.aboutProject.subheadline}
+            </p>
+            <p className="text-sm md:text-base text-gray-600">
+              {about.description || defaultContent.aboutProject.description}
+            </p>
+            {Array.isArray(about.highlights) && about.highlights.length > 0 && (
+              <div className="grid sm:grid-cols-2 gap-2 pt-1">
+                {about.highlights.map((item, idx) => (
+                  <div
+                    key={`${item}-${idx}`}
+                    className="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-700"
+                  >
+                    {item}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div>
@@ -142,7 +127,7 @@ function AboutTabsPanel() {
                         <img
                           src={member.imageUrl}
                           alt={member.name}
-                          className="w-14 h-14 rounded-full object-cover border border-gray-300"
+                          className="w-16 h-16 rounded-lg object-contain bg-gray-50 border border-gray-300 p-1"
                         />
                       ) : (
                         <FaUserCircle className="w-14 h-14 text-gray-400" />
@@ -182,4 +167,3 @@ function AboutTabsPanel() {
 }
 
 export default AboutTabsPanel;
-

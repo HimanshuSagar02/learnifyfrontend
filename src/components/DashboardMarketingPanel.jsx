@@ -202,7 +202,7 @@ function DashboardMarketingPanel({ userData }) {
                   <img
                     src={content.currentOffer.imageUrl}
                     alt={content.currentOffer.title || "Offer"}
-                    className="mt-4 w-full h-44 sm:h-52 object-cover rounded-xl border border-[#3B82F6]/40"
+                    className="mt-4 w-full max-h-72 object-contain rounded-xl border border-[#3B82F6]/40 bg-black/10"
                   />
                 )}
               </div>
@@ -226,7 +226,11 @@ function DashboardMarketingPanel({ userData }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {content.gallery.map((item) => (
                   <div key={item._id} className="border rounded-xl overflow-hidden bg-gray-50">
-                    <img src={item.imageUrl} alt={item.caption || "Gallery"} className="w-full h-44 object-cover" />
+                    <img
+                      src={item.imageUrl}
+                      alt={item.caption || "Gallery"}
+                      className="w-full max-h-64 object-contain bg-white"
+                    />
                     <div className="p-3 text-sm text-gray-700 break-words">{item.caption || "Campus moment"}</div>
                   </div>
                 ))}
