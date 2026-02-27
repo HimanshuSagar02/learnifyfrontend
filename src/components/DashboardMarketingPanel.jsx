@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { serverUrl } from "../App";
-import { FaBullhorn, FaCalendarAlt, FaImage, FaPhoneAlt } from "react-icons/fa";
+import { FaBullhorn, FaCalendarAlt, FaExternalLinkAlt, FaImage, FaPhoneAlt, FaUserCircle, FaUsers } from "react-icons/fa";
 
 const defaultContent = {
   currentOffer: {
@@ -15,6 +15,7 @@ const defaultContent = {
     isActive: true,
   },
   gallery: [],
+  teamMembers: [],
 };
 
 function DashboardMarketingPanel({ userData }) {
@@ -51,6 +52,7 @@ function DashboardMarketingPanel({ userData }) {
           ...(res.data?.currentOffer || {}),
         },
         gallery: Array.isArray(res.data?.gallery) ? res.data.gallery : [],
+        teamMembers: Array.isArray(res.data?.teamMembers) ? res.data.teamMembers : [],
       });
     } catch {
       setContent(defaultContent);
@@ -67,6 +69,13 @@ function DashboardMarketingPanel({ userData }) {
     const offer = content.currentOffer || {};
     return offer.isActive !== false && (offer.title || offer.description || offer.imageUrl);
   }, [content.currentOffer]);
+
+  const activeTeamMembers = useMemo(() => {
+    const members = Array.isArray(content.teamMembers) ? content.teamMembers : [];
+    return members
+      .filter((member) => member?.name && member?.isActive !== false)
+      .sort((a, b) => (Number(a.displayOrder) || 0) - (Number(b.displayOrder) || 0));
+  }, [content.teamMembers]);
 
   const handleBookDemo = async (e) => {
     e.preventDefault();
@@ -233,6 +242,51 @@ function DashboardMarketingPanel({ userData }) {
               </div>
             ) : (
               <p className="text-gray-500">Gallery is empty right now.</p>
+            )}
+          </div>
+
+          <div className="bg-white rounded-2xl p-4 sm:p-6 border-2 border-gray-200 shadow-sm">
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <FaUsers className="text-[#3B82F6]" />
+              Our Team
+            </h3>
+            {activeTeamMembers.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {activeTeamMembers.map((member) => (
+                  <div key={member._id} className="border rounded-xl p-4 bg-gray-50 space-y-3">
+                    <div className="flex items-start gap-3">
+                      {member.imageUrl ? (
+                        <img
+                          src={member.imageUrl}
+                          alt={member.name}
+                          className="w-14 h-14 rounded-full object-cover border border-gray-300"
+                        />
+                      ) : (
+                        <FaUserCircle className="w-14 h-14 text-gray-400" />
+                      )}
+                      <div>
+                        <p className="font-bold text-gray-900">{member.name}</p>
+                        <p className="text-sm text-[#3B82F6] font-medium">{member.role || "Team Member"}</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-700 break-words">
+                      {member.description || "Experienced professional guiding learners on Learnify."}
+                    </p>
+                    {member.profileLink && (
+                      <a
+                        href={member.profileLink}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-[#3B82F6] hover:underline"
+                      >
+                        View Profile <FaExternalLinkAlt className="text-xs" />
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">Team details will be updated soon.</p>
             )}
           </div>
         </>

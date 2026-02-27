@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { serverUrl } from "../../App";
-import { FaBullhorn, FaImage, FaTrash, FaUpload } from "react-icons/fa";
+import { FaBullhorn, FaExternalLinkAlt, FaImage, FaSave, FaTrash, FaUpload, FaUsers } from "react-icons/fa";
 
 const defaultContent = {
   currentOffer: {
@@ -16,6 +16,17 @@ const defaultContent = {
     isActive: true,
   },
   gallery: [],
+  teamMembers: [],
+};
+
+const defaultTeamForm = {
+  name: "",
+  role: "",
+  description: "",
+  profileLink: "",
+  imageUrl: "",
+  displayOrder: 0,
+  isActive: true,
 };
 
 function MarketingManager() {
@@ -28,6 +39,11 @@ function MarketingManager() {
   const [loading, setLoading] = useState(false);
   const [savingOffer, setSavingOffer] = useState(false);
   const [savingGallery, setSavingGallery] = useState(false);
+  const [teamForm, setTeamForm] = useState(defaultTeamForm);
+  const [addingTeam, setAddingTeam] = useState(false);
+  const [teamDrafts, setTeamDrafts] = useState({});
+  const [updatingTeamId, setUpdatingTeamId] = useState("");
+  const [deletingTeamId, setDeletingTeamId] = useState("");
   const [updatingBooking, setUpdatingBooking] = useState("");
 
   const fetchMarketingContent = async () => {
@@ -46,6 +62,7 @@ function MarketingManager() {
             : "",
         },
         gallery: Array.isArray(data.gallery) ? data.gallery : [],
+        teamMembers: Array.isArray(data.teamMembers) ? data.teamMembers : [],
       });
     } catch {
       setContent(defaultContent);
@@ -75,6 +92,22 @@ function MarketingManager() {
   useEffect(() => {
     fetchBookings(statusFilter);
   }, [statusFilter]);
+
+  useEffect(() => {
+    const nextDrafts = {};
+    (content.teamMembers || []).forEach((member) => {
+      nextDrafts[member._id] = {
+        name: member.name || "",
+        role: member.role || "",
+        description: member.description || "",
+        profileLink: member.profileLink || "",
+        imageUrl: member.imageUrl || "",
+        displayOrder: Number.isFinite(Number(member.displayOrder)) ? Number(member.displayOrder) : 0,
+        isActive: member.isActive !== false,
+      };
+    });
+    setTeamDrafts(nextDrafts);
+  }, [content.teamMembers]);
 
   const bookingStats = useMemo(() => {
     return bookings.reduce(
@@ -218,6 +251,113 @@ function MarketingManager() {
       toast.error(error?.response?.data?.message || "Failed to update booking status");
     } finally {
       setUpdatingBooking("");
+    }
+  };
+
+  const addTeamMember = async (e) => {
+    e.preventDefault();
+    if (!teamForm.name.trim()) {
+      toast.error("Team member name is required");
+      return;
+    }
+
+    setAddingTeam(true);
+    try {
+      const res = await axios.post(
+        `${serverUrl}/api/marketing/admin/team`,
+        {
+          ...teamForm,
+          name: teamForm.name.trim(),
+          role: teamForm.role.trim(),
+          description: teamForm.description.trim(),
+          profileLink: teamForm.profileLink.trim(),
+          imageUrl: teamForm.imageUrl.trim(),
+          displayOrder: Number(teamForm.displayOrder) || 0,
+        },
+        { withCredentials: true }
+      );
+
+      if (res.data?.content) {
+        setContent((prev) => ({
+          ...prev,
+          ...res.data.content,
+          teamMembers: Array.isArray(res.data.content.teamMembers) ? res.data.content.teamMembers : prev.teamMembers,
+        }));
+      } else {
+        fetchMarketingContent();
+      }
+
+      setTeamForm(defaultTeamForm);
+      toast.success(res.data?.message || "Team member added");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to add team member");
+    } finally {
+      setAddingTeam(false);
+    }
+  };
+
+  const updateTeamMember = async (memberId) => {
+    const draft = teamDrafts[memberId];
+    if (!draft) return;
+    if (!draft.name.trim()) {
+      toast.error("Team member name is required");
+      return;
+    }
+
+    setUpdatingTeamId(memberId);
+    try {
+      const res = await axios.patch(
+        `${serverUrl}/api/marketing/admin/team/${memberId}`,
+        {
+          ...draft,
+          name: draft.name.trim(),
+          role: draft.role.trim(),
+          description: draft.description.trim(),
+          profileLink: draft.profileLink.trim(),
+          imageUrl: draft.imageUrl.trim(),
+          displayOrder: Number(draft.displayOrder) || 0,
+        },
+        { withCredentials: true }
+      );
+
+      if (res.data?.content) {
+        setContent((prev) => ({
+          ...prev,
+          ...res.data.content,
+          teamMembers: Array.isArray(res.data.content.teamMembers) ? res.data.content.teamMembers : prev.teamMembers,
+        }));
+      } else {
+        fetchMarketingContent();
+      }
+
+      toast.success("Team member updated");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to update team member");
+    } finally {
+      setUpdatingTeamId("");
+    }
+  };
+
+  const deleteTeamMember = async (memberId) => {
+    setDeletingTeamId(memberId);
+    try {
+      const res = await axios.delete(`${serverUrl}/api/marketing/admin/team/${memberId}`, {
+        withCredentials: true,
+      });
+      if (res.data?.content) {
+        setContent((prev) => ({
+          ...prev,
+          ...res.data.content,
+          teamMembers: Array.isArray(res.data.content.teamMembers) ? res.data.content.teamMembers : prev.teamMembers,
+        }));
+      } else {
+        fetchMarketingContent();
+      }
+      toast.success("Team member removed");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to remove team member");
+    } finally {
+      setDeletingTeamId("");
     }
   };
 
@@ -395,6 +535,214 @@ function MarketingManager() {
               </div>
             )}
           </form>
+
+          <div className="bg-white rounded-xl shadow-lg p-4 sm:p-5 border border-gray-200 space-y-4">
+            <h4 className="text-lg font-semibold flex items-center gap-2">
+              <FaUsers className="text-[#3B82F6]" />
+              Our Team Management
+            </h4>
+
+            <form onSubmit={addTeamMember} className="grid sm:grid-cols-2 gap-3">
+              <input
+                type="text"
+                value={teamForm.name}
+                onChange={(e) => setTeamForm((prev) => ({ ...prev, name: e.target.value }))}
+                placeholder="Full name"
+                className="w-full border rounded-lg px-3 py-2"
+                required
+              />
+              <input
+                type="text"
+                value={teamForm.role}
+                onChange={(e) => setTeamForm((prev) => ({ ...prev, role: e.target.value }))}
+                placeholder="Role (e.g. Co-Founder)"
+                className="w-full border rounded-lg px-3 py-2"
+              />
+              <input
+                type="url"
+                value={teamForm.profileLink}
+                onChange={(e) => setTeamForm((prev) => ({ ...prev, profileLink: e.target.value }))}
+                placeholder="Profile link (https://...)"
+                className="w-full border rounded-lg px-3 py-2"
+              />
+              <input
+                type="url"
+                value={teamForm.imageUrl}
+                onChange={(e) => setTeamForm((prev) => ({ ...prev, imageUrl: e.target.value }))}
+                placeholder="Image URL (https://...)"
+                className="w-full border rounded-lg px-3 py-2"
+              />
+              <textarea
+                value={teamForm.description}
+                onChange={(e) => setTeamForm((prev) => ({ ...prev, description: e.target.value }))}
+                placeholder="Description / bio"
+                className="sm:col-span-2 w-full border rounded-lg px-3 py-2 min-h-[90px]"
+              />
+              <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
+                <input
+                  type="number"
+                  value={teamForm.displayOrder}
+                  onChange={(e) =>
+                    setTeamForm((prev) => ({
+                      ...prev,
+                      displayOrder: Number(e.target.value || 0),
+                    }))
+                  }
+                  placeholder="Display order"
+                  className="w-40 border rounded-lg px-3 py-2"
+                />
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={teamForm.isActive !== false}
+                    onChange={(e) => setTeamForm((prev) => ({ ...prev, isActive: e.target.checked }))}
+                  />
+                  Active
+                </label>
+                <button
+                  type="submit"
+                  disabled={addingTeam}
+                  className="ml-auto px-4 py-2 bg-[#3B82F6] text-black rounded-lg font-semibold hover:bg-[#2563EB] disabled:opacity-60"
+                >
+                  {addingTeam ? "Adding..." : "Add Team Member"}
+                </button>
+              </div>
+            </form>
+
+            {content.teamMembers.length === 0 ? (
+              <p className="text-sm text-gray-500">No team members added yet.</p>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {content.teamMembers.map((member) => {
+                  const draft = teamDrafts[member._id] || {
+                    name: "",
+                    role: "",
+                    description: "",
+                    profileLink: "",
+                    imageUrl: "",
+                    displayOrder: 0,
+                    isActive: true,
+                  };
+
+                  return (
+                    <div key={member._id} className="border rounded-xl p-3 space-y-2 bg-gray-50">
+                      <input
+                        type="text"
+                        value={draft.name}
+                        onChange={(e) =>
+                          setTeamDrafts((prev) => ({
+                            ...prev,
+                            [member._id]: { ...draft, name: e.target.value },
+                          }))
+                        }
+                        className="w-full border rounded px-2 py-1.5"
+                        placeholder="Name"
+                      />
+                      <input
+                        type="text"
+                        value={draft.role}
+                        onChange={(e) =>
+                          setTeamDrafts((prev) => ({
+                            ...prev,
+                            [member._id]: { ...draft, role: e.target.value },
+                          }))
+                        }
+                        className="w-full border rounded px-2 py-1.5"
+                        placeholder="Role"
+                      />
+                      <input
+                        type="url"
+                        value={draft.profileLink}
+                        onChange={(e) =>
+                          setTeamDrafts((prev) => ({
+                            ...prev,
+                            [member._id]: { ...draft, profileLink: e.target.value },
+                          }))
+                        }
+                        className="w-full border rounded px-2 py-1.5"
+                        placeholder="Profile link"
+                      />
+                      <input
+                        type="url"
+                        value={draft.imageUrl}
+                        onChange={(e) =>
+                          setTeamDrafts((prev) => ({
+                            ...prev,
+                            [member._id]: { ...draft, imageUrl: e.target.value },
+                          }))
+                        }
+                        className="w-full border rounded px-2 py-1.5"
+                        placeholder="Image URL"
+                      />
+                      <textarea
+                        value={draft.description}
+                        onChange={(e) =>
+                          setTeamDrafts((prev) => ({
+                            ...prev,
+                            [member._id]: { ...draft, description: e.target.value },
+                          }))
+                        }
+                        className="w-full border rounded px-2 py-1.5 min-h-[70px]"
+                        placeholder="Description"
+                      />
+                      <div className="flex flex-wrap items-center gap-3">
+                        <input
+                          type="number"
+                          value={draft.displayOrder}
+                          onChange={(e) =>
+                            setTeamDrafts((prev) => ({
+                              ...prev,
+                              [member._id]: { ...draft, displayOrder: Number(e.target.value || 0) },
+                            }))
+                          }
+                          className="w-24 border rounded px-2 py-1.5"
+                        />
+                        <label className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={draft.isActive !== false}
+                            onChange={(e) =>
+                              setTeamDrafts((prev) => ({
+                                ...prev,
+                                [member._id]: { ...draft, isActive: e.target.checked },
+                              }))
+                            }
+                          />
+                          Active
+                        </label>
+                        {draft.profileLink && (
+                          <a
+                            href={draft.profileLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[#3B82F6] text-sm flex items-center gap-1 hover:underline"
+                          >
+                            <FaExternalLinkAlt /> Open
+                          </a>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => updateTeamMember(member._id)}
+                          disabled={updatingTeamId === member._id}
+                          className="ml-auto px-3 py-1.5 bg-black text-[#3B82F6] rounded border border-black hover:bg-gray-900 text-sm disabled:opacity-60 flex items-center gap-1"
+                        >
+                          <FaSave /> {updatingTeamId === member._id ? "Saving..." : "Save"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteTeamMember(member._id)}
+                          disabled={deletingTeamId === member._id}
+                          className="px-3 py-1.5 bg-red-50 text-red-700 rounded border border-red-200 hover:bg-red-100 text-sm disabled:opacity-60 flex items-center gap-1"
+                        >
+                          <FaTrash /> {deletingTeamId === member._id ? "Removing..." : "Delete"}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           <div className="bg-white rounded-xl shadow-lg p-4 sm:p-5 border border-gray-200 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">

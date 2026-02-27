@@ -5,6 +5,15 @@ import { ClipLoader } from 'react-spinners'
 import { serverUrl } from '../App'
 import { toast } from 'react-toastify'
 
+const REQUEST_TIMEOUT_MS = 20000;
+
+const getRequestErrorMessage = (error, fallbackMessage) => {
+  if (error?.code === "ECONNABORTED") {
+    return "Request timeout. Please try again.";
+  }
+  return error?.response?.data?.message || error?.message || fallbackMessage;
+};
+
 function ForgotPassword() {
     let navigate = useNavigate()
     const [step,setStep] = useState(1)
@@ -15,6 +24,7 @@ function ForgotPassword() {
     const [conPassword,setConpassword]= useState("")
 
    const handleStep1 = async () => {
+    if (loading) return;
     if (!email.trim()) {
       toast.error("Please enter your email address");
       return;
@@ -23,7 +33,11 @@ function ForgotPassword() {
     setLoading(true)
     try {
       console.log("[ForgotPassword] Sending OTP to:", email);
-      const result = await axios.post(`${serverUrl}/api/auth/sendotp`, {email}, {withCredentials: true})
+      const result = await axios.post(
+        `${serverUrl}/api/auth/sendotp`,
+        { email },
+        { withCredentials: false, timeout: REQUEST_TIMEOUT_MS }
+      )
       console.log("[ForgotPassword] OTP response:", result.data);
       
       // Check if OTP is in response (development mode)
@@ -37,17 +51,18 @@ function ForgotPassword() {
       }
       
       setStep(2)
-      setLoading(false)
       
     } catch (error) {
       console.error("[ForgotPassword] Error sending OTP:", error);
-      const errorMessage = error.response?.data?.message || error.message || "Failed to send OTP. Please try again.";
+      const errorMessage = getRequestErrorMessage(error, "Failed to send OTP. Please try again.");
       toast.error(errorMessage);
+    } finally {
       setLoading(false)
     }
     
    }
     const handleStep2 = async () => {
+    if (loading) return;
     if (!otp || otp.length !== 4) {
       toast.error("Please enter a valid 4-digit OTP");
       return;
@@ -56,21 +71,26 @@ function ForgotPassword() {
     setLoading(true)
     try {
       console.log("[ForgotPassword] Verifying OTP for:", email);
-      const result = await axios.post(`${serverUrl}/api/auth/verifyotp`, {email, otp}, {withCredentials: true})
+      const result = await axios.post(
+        `${serverUrl}/api/auth/verifyotp`,
+        { email, otp },
+        { withCredentials: false, timeout: REQUEST_TIMEOUT_MS }
+      )
       console.log("[ForgotPassword] OTP verified successfully:", result.data);
       
       toast.success(result.data.message || "OTP verified successfully")
-      setLoading(false)
       setStep(3)
     } catch (error) {
       console.error("[ForgotPassword] Error verifying OTP:", error);
-      const errorMessage = error.response?.data?.message || error.message || "Invalid OTP. Please try again.";
+      const errorMessage = getRequestErrorMessage(error, "Invalid OTP. Please try again.");
       toast.error(errorMessage);
+    } finally {
       setLoading(false)
     }
     
    }
     const handleStep3 = async () => {
+    if (loading) return;
     if(!newpassword || !conPassword){
       toast.error("Please enter both password fields")
       return
@@ -87,10 +107,13 @@ function ForgotPassword() {
     setLoading(true)
     try {
       console.log("[ForgotPassword] Resetting password for:", email);
-      const result = await axios.post(`${serverUrl}/api/auth/resetpassword`, {email, password: newpassword}, {withCredentials: true})
+      const result = await axios.post(
+        `${serverUrl}/api/auth/resetpassword`,
+        { email, password: newpassword },
+        { withCredentials: false, timeout: REQUEST_TIMEOUT_MS }
+      )
       console.log("[ForgotPassword] Password reset successfully:", result.data);
       toast.success(result.data.message || "Password reset successfully")
-      setLoading(false)
       
       // Small delay before navigation
       setTimeout(() => {
@@ -98,8 +121,9 @@ function ForgotPassword() {
       }, 1000);
     } catch (error) {
       console.error("[ForgotPassword] Error resetting password:", error);
-      const errorMessage = error?.response?.data?.message || error.message || "Failed to reset password. Please try again.";
+      const errorMessage = getRequestErrorMessage(error, "Failed to reset password. Please try again.");
       toast.error(errorMessage);
+    } finally {
       setLoading(false)
     }
     
