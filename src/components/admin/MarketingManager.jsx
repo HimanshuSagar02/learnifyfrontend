@@ -17,6 +17,15 @@ const defaultContent = {
   },
   gallery: [],
   teamMembers: [],
+  aboutProject: {
+    badgeTitle: "About Project",
+    headline: "",
+    subheadline: "",
+    description: "",
+    highlights: [],
+    imageUrl: "",
+    isActive: true,
+  },
 };
 
 const defaultTeamForm = {
@@ -24,10 +33,22 @@ const defaultTeamForm = {
   role: "",
   description: "",
   profileLink: "",
-  imageUrl: "",
   displayOrder: 0,
   isActive: true,
 };
+
+const defaultAboutForm = {
+  badgeTitle: "About Project",
+  headline: "",
+  subheadline: "",
+  description: "",
+  highlightsText: "",
+  imageUrl: "",
+  isActive: true,
+};
+
+const PROFILE_LINK_HELP_TEXT =
+  "Allowed profile URLs: LinkedIn, GitHub, X(Twitter), Instagram, Facebook, YouTube";
 
 function MarketingManager() {
   const [content, setContent] = useState(defaultContent);
@@ -39,7 +60,11 @@ function MarketingManager() {
   const [loading, setLoading] = useState(false);
   const [savingOffer, setSavingOffer] = useState(false);
   const [savingGallery, setSavingGallery] = useState(false);
+  const [savingAbout, setSavingAbout] = useState(false);
+  const [aboutForm, setAboutForm] = useState(defaultAboutForm);
   const [teamForm, setTeamForm] = useState(defaultTeamForm);
+  const [teamImageFile, setTeamImageFile] = useState(null);
+  const [teamImageFiles, setTeamImageFiles] = useState({});
   const [addingTeam, setAddingTeam] = useState(false);
   const [teamDrafts, setTeamDrafts] = useState({});
   const [updatingTeamId, setUpdatingTeamId] = useState("");
@@ -63,9 +88,29 @@ function MarketingManager() {
         },
         gallery: Array.isArray(data.gallery) ? data.gallery : [],
         teamMembers: Array.isArray(data.teamMembers) ? data.teamMembers : [],
+        aboutProject: {
+          ...defaultContent.aboutProject,
+          ...(data.aboutProject || {}),
+          highlights: Array.isArray(data.aboutProject?.highlights)
+            ? data.aboutProject.highlights
+            : defaultContent.aboutProject.highlights,
+        },
+      });
+
+      setAboutForm({
+        badgeTitle: data.aboutProject?.badgeTitle || "About Project",
+        headline: data.aboutProject?.headline || "",
+        subheadline: data.aboutProject?.subheadline || "",
+        description: data.aboutProject?.description || "",
+        highlightsText: Array.isArray(data.aboutProject?.highlights)
+          ? data.aboutProject.highlights.join("\n")
+          : "",
+        imageUrl: data.aboutProject?.imageUrl || "",
+        isActive: data.aboutProject?.isActive !== false,
       });
     } catch {
       setContent(defaultContent);
+      setAboutForm(defaultAboutForm);
     } finally {
       setLoading(false);
     }
@@ -101,7 +146,6 @@ function MarketingManager() {
         role: member.role || "",
         description: member.description || "",
         profileLink: member.profileLink || "",
-        imageUrl: member.imageUrl || "",
         displayOrder: Number.isFinite(Number(member.displayOrder)) ? Number(member.displayOrder) : 0,
         isActive: member.isActive !== false,
       };
@@ -254,6 +298,51 @@ function MarketingManager() {
     }
   };
 
+  const updateAboutProject = async (e) => {
+    e.preventDefault();
+    setSavingAbout(true);
+
+    try {
+      const highlights = aboutForm.highlightsText
+        .split(/\r?\n|,/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+
+      const res = await axios.patch(
+        `${serverUrl}/api/marketing/admin/about-project`,
+        {
+          badgeTitle: aboutForm.badgeTitle,
+          headline: aboutForm.headline,
+          subheadline: aboutForm.subheadline,
+          description: aboutForm.description,
+          highlights,
+          imageUrl: aboutForm.imageUrl,
+          isActive: aboutForm.isActive,
+        },
+        { withCredentials: true }
+      );
+
+      if (res.data?.content) {
+        setContent((prev) => ({
+          ...prev,
+          ...res.data.content,
+          aboutProject: {
+            ...prev.aboutProject,
+            ...(res.data.content.aboutProject || {}),
+          },
+        }));
+      } else {
+        fetchMarketingContent();
+      }
+
+      toast.success(res.data?.message || "About project updated");
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to update about project");
+    } finally {
+      setSavingAbout(false);
+    }
+  };
+
   const addTeamMember = async (e) => {
     e.preventDefault();
     if (!teamForm.name.trim()) {
@@ -263,17 +352,20 @@ function MarketingManager() {
 
     setAddingTeam(true);
     try {
+      const formData = new FormData();
+      formData.append("name", teamForm.name.trim());
+      formData.append("role", teamForm.role.trim());
+      formData.append("description", teamForm.description.trim());
+      formData.append("profileLink", teamForm.profileLink.trim());
+      formData.append("displayOrder", String(Number(teamForm.displayOrder) || 0));
+      formData.append("isActive", teamForm.isActive !== false ? "true" : "false");
+      if (teamImageFile) {
+        formData.append("image", teamImageFile);
+      }
+
       const res = await axios.post(
         `${serverUrl}/api/marketing/admin/team`,
-        {
-          ...teamForm,
-          name: teamForm.name.trim(),
-          role: teamForm.role.trim(),
-          description: teamForm.description.trim(),
-          profileLink: teamForm.profileLink.trim(),
-          imageUrl: teamForm.imageUrl.trim(),
-          displayOrder: Number(teamForm.displayOrder) || 0,
-        },
+        formData,
         { withCredentials: true }
       );
 
@@ -288,6 +380,7 @@ function MarketingManager() {
       }
 
       setTeamForm(defaultTeamForm);
+      setTeamImageFile(null);
       toast.success(res.data?.message || "Team member added");
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to add team member");
@@ -306,17 +399,20 @@ function MarketingManager() {
 
     setUpdatingTeamId(memberId);
     try {
+      const formData = new FormData();
+      formData.append("name", draft.name.trim());
+      formData.append("role", draft.role.trim());
+      formData.append("description", draft.description.trim());
+      formData.append("profileLink", draft.profileLink.trim());
+      formData.append("displayOrder", String(Number(draft.displayOrder) || 0));
+      formData.append("isActive", draft.isActive !== false ? "true" : "false");
+      if (teamImageFiles[memberId]) {
+        formData.append("image", teamImageFiles[memberId]);
+      }
+
       const res = await axios.patch(
         `${serverUrl}/api/marketing/admin/team/${memberId}`,
-        {
-          ...draft,
-          name: draft.name.trim(),
-          role: draft.role.trim(),
-          description: draft.description.trim(),
-          profileLink: draft.profileLink.trim(),
-          imageUrl: draft.imageUrl.trim(),
-          displayOrder: Number(draft.displayOrder) || 0,
-        },
+        formData,
         { withCredentials: true }
       );
 
@@ -330,6 +426,12 @@ function MarketingManager() {
         fetchMarketingContent();
       }
 
+      setTeamImageFiles((prev) => {
+        if (!prev[memberId]) return prev;
+        const next = { ...prev };
+        delete next[memberId];
+        return next;
+      });
       toast.success("Team member updated");
     } catch (error) {
       toast.error(error?.response?.data?.message || "Failed to update team member");
@@ -383,6 +485,67 @@ function MarketingManager() {
         <div className="text-center py-10 text-gray-500">Loading marketing details...</div>
       ) : (
         <>
+          <form onSubmit={updateAboutProject} className="bg-white rounded-xl shadow-lg p-4 sm:p-5 border border-gray-200 space-y-3">
+            <h4 className="text-lg font-semibold">About Project (Home Top Tabs)</h4>
+            <input
+              type="text"
+              value={aboutForm.badgeTitle}
+              onChange={(e) => setAboutForm((prev) => ({ ...prev, badgeTitle: e.target.value }))}
+              placeholder="Badge title (e.g. About Project)"
+              className="w-full border rounded-lg px-3 py-2"
+            />
+            <input
+              type="text"
+              value={aboutForm.headline}
+              onChange={(e) => setAboutForm((prev) => ({ ...prev, headline: e.target.value }))}
+              placeholder="Headline"
+              className="w-full border rounded-lg px-3 py-2"
+            />
+            <input
+              type="text"
+              value={aboutForm.subheadline}
+              onChange={(e) => setAboutForm((prev) => ({ ...prev, subheadline: e.target.value }))}
+              placeholder="Subheadline"
+              className="w-full border rounded-lg px-3 py-2"
+            />
+            <textarea
+              value={aboutForm.description}
+              onChange={(e) => setAboutForm((prev) => ({ ...prev, description: e.target.value }))}
+              placeholder="Description"
+              className="w-full border rounded-lg px-3 py-2 min-h-[90px]"
+            />
+            <textarea
+              value={aboutForm.highlightsText}
+              onChange={(e) => setAboutForm((prev) => ({ ...prev, highlightsText: e.target.value }))}
+              placeholder="Highlights (one per line or comma separated)"
+              className="w-full border rounded-lg px-3 py-2 min-h-[90px]"
+            />
+            <div className="grid sm:grid-cols-2 gap-3">
+              <input
+                type="url"
+                value={aboutForm.imageUrl}
+                onChange={(e) => setAboutForm((prev) => ({ ...prev, imageUrl: e.target.value }))}
+                placeholder="Image URL (optional)"
+                className="w-full border rounded-lg px-3 py-2"
+              />
+              <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={aboutForm.isActive !== false}
+                  onChange={(e) => setAboutForm((prev) => ({ ...prev, isActive: e.target.checked }))}
+                />
+                About section active
+              </label>
+            </div>
+            <button
+              type="submit"
+              disabled={savingAbout}
+              className="px-4 py-2 bg-[#3B82F6] text-black font-semibold rounded-lg hover:bg-[#2563EB] disabled:opacity-60"
+            >
+              {savingAbout ? "Saving..." : "Save About Project"}
+            </button>
+          </form>
+
           <form onSubmit={updateOffer} className="bg-white rounded-xl shadow-lg p-4 sm:p-5 border border-gray-200 space-y-3">
             <h4 className="text-lg font-semibold">Current Offer</h4>
             <input
@@ -562,22 +725,26 @@ function MarketingManager() {
                 type="url"
                 value={teamForm.profileLink}
                 onChange={(e) => setTeamForm((prev) => ({ ...prev, profileLink: e.target.value }))}
-                placeholder="Profile link (https://...)"
+                placeholder="Profile URL (LinkedIn/GitHub...)"
                 className="w-full border rounded-lg px-3 py-2"
               />
-              <input
-                type="url"
-                value={teamForm.imageUrl}
-                onChange={(e) => setTeamForm((prev) => ({ ...prev, imageUrl: e.target.value }))}
-                placeholder="Image URL (https://...)"
-                className="w-full border rounded-lg px-3 py-2"
-              />
+              <label className="w-full border rounded-lg px-3 py-2 bg-white text-sm text-gray-700 cursor-pointer hover:bg-gray-50 flex items-center justify-between gap-2">
+                <span className="truncate">{teamImageFile ? teamImageFile.name : "Upload team photo"}</span>
+                <span className="text-xs text-gray-500">image/*</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setTeamImageFile(e.target.files?.[0] || null)}
+                  className="hidden"
+                />
+              </label>
               <textarea
                 value={teamForm.description}
                 onChange={(e) => setTeamForm((prev) => ({ ...prev, description: e.target.value }))}
                 placeholder="Description / bio"
                 className="sm:col-span-2 w-full border rounded-lg px-3 py-2 min-h-[90px]"
               />
+              <p className="sm:col-span-2 text-xs text-gray-500">{PROFILE_LINK_HELP_TEXT}</p>
               <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
                 <input
                   type="number"
@@ -619,7 +786,6 @@ function MarketingManager() {
                     role: "",
                     description: "",
                     profileLink: "",
-                    imageUrl: "",
                     displayOrder: 0,
                     isActive: true,
                   };
@@ -660,20 +826,32 @@ function MarketingManager() {
                           }))
                         }
                         className="w-full border rounded px-2 py-1.5"
-                        placeholder="Profile link"
+                        placeholder="Profile URL (LinkedIn/GitHub...)"
                       />
-                      <input
-                        type="url"
-                        value={draft.imageUrl}
-                        onChange={(e) =>
-                          setTeamDrafts((prev) => ({
-                            ...prev,
-                            [member._id]: { ...draft, imageUrl: e.target.value },
-                          }))
-                        }
-                        className="w-full border rounded px-2 py-1.5"
-                        placeholder="Image URL"
-                      />
+                      {member.imageUrl && (
+                        <img
+                          src={member.imageUrl}
+                          alt={member.name || "Team member"}
+                          className="w-14 h-14 rounded-full object-cover border border-gray-300"
+                        />
+                      )}
+                      <label className="w-full border rounded px-2 py-1.5 bg-white text-sm text-gray-700 cursor-pointer hover:bg-gray-100 flex items-center justify-between gap-2">
+                        <span className="truncate">
+                          {teamImageFiles[member._id]?.name || "Upload new photo"}
+                        </span>
+                        <span className="text-xs text-gray-500">image/*</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) =>
+                            setTeamImageFiles((prev) => ({
+                              ...prev,
+                              [member._id]: e.target.files?.[0] || null,
+                            }))
+                          }
+                          className="hidden"
+                        />
+                      </label>
                       <textarea
                         value={draft.description}
                         onChange={(e) =>
@@ -685,6 +863,7 @@ function MarketingManager() {
                         className="w-full border rounded px-2 py-1.5 min-h-[70px]"
                         placeholder="Description"
                       />
+                      <p className="text-xs text-gray-500">{PROFILE_LINK_HELP_TEXT}</p>
                       <div className="flex flex-wrap items-center gap-3">
                         <input
                           type="number"

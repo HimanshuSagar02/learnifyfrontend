@@ -5,13 +5,13 @@ import { SiViaplay } from "react-icons/si";
 import Logos from "../components/Logos";
 import Cardspage from "../components/Cardspage";
 import ExploreCourses from "../components/ExploreCourses";
-import About from "../components/About";
 import ai from "../assets/ai.png";
 import ai1 from "../assets/SearchAi.png";
 import ReviewPage from "../components/ReviewPage";
 import Footer from "../components/Footer";
 import LandingFeatures from "../components/LandingFeatures";
 import DashboardMarketingPanel from "../components/DashboardMarketingPanel";
+import AboutTabsPanel from "../components/AboutTabsPanel";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -97,6 +97,8 @@ function Home() {
         </div>
       </section>
 
+      <AboutTabsPanel />
+
       <ExploreCourses />
       <Cardspage />
       <LandingFeatures userData={userData} />
@@ -105,7 +107,6 @@ function Home() {
           <DashboardMarketingPanel userData={userData} />
         </div>
       </section>
-      <About />
       <ReviewPage />
       <Footer />
     </div>
