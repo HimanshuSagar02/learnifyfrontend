@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { FaCertificate, FaDownload, FaQrcode, FaCheckCircle, FaSpinner } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { getAxiosErrorMessage } from "../utils/blobError";
 
 function MyCertificates() {
   const { userData } = useSelector((state) => state.user);
@@ -66,7 +67,7 @@ function MyCertificates() {
       toast.success("Certificate downloaded successfully!");
     } catch (error) {
       console.error("Download certificate error:", error);
-      toast.error(error.response?.data?.message || "Failed to download certificate");
+      toast.error(await getAxiosErrorMessage(error, "Failed to download certificate"));
     } finally {
       setDownloading(prev => ({ ...prev, [courseId]: false }));
     }

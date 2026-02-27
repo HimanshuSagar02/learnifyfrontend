@@ -9,6 +9,7 @@ import { GiAchievement } from "react-icons/gi";
 import Confetti from "react-confetti";
 import { useWindowSize } from "@uidotdev/usehooks";
 import { toast } from "react-toastify";
+import { getAxiosErrorMessage } from "../utils/blobError";
 
 function ViewLecture() {
   const { courseId } = useParams();
@@ -251,7 +252,7 @@ const generateQuiz = async () => {
                     window.URL.revokeObjectURL(url);
                   } catch (error) {
                     console.error("Certificate download error:", error);
-                    toast.error(error.response?.data?.message || "Failed to download certificate");
+                    toast.error(await getAxiosErrorMessage(error, "Failed to download certificate"));
                   }
                 }}
                 className="bg-green-600 mt-4 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition-all"
@@ -346,13 +347,13 @@ const generateQuiz = async () => {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
         toast.success("Certificate downloaded successfully!");
-      } catch (error) {
-        console.error("Certificate download error:", error);
-        toast.error(error.response?.data?.message || "Failed to download certificate");
-      }
-	    }}
-	    className="mt-6 px-6 py-3 rounded-xl border border-[#3B82F6] bg-black text-[#3B82F6] font-semibold shadow-lg transition-all duration-300 hover:bg-gray-900 hover:shadow-xl flex items-center gap-2"
-	  >
+	      } catch (error) {
+	        console.error("Certificate download error:", error);
+	        toast.error(await getAxiosErrorMessage(error, "Failed to download certificate"));
+	      }
+		    }}
+		    className="mt-6 px-6 py-3 rounded-xl border border-[#3B82F6] bg-black text-[#3B82F6] font-semibold shadow-lg transition-all duration-300 hover:bg-gray-900 hover:shadow-xl flex items-center gap-2"
+		  >
 	    <GiAchievement className="text-[#3B82F6]" />
 	    Download Certificate
 	  </button>
