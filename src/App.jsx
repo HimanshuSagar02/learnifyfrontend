@@ -52,11 +52,32 @@ const normalizeServerUrl = (value) => {
   return withProtocol.replace(/\/+$/, "");
 };
 
+const getApiBaseUrl = () => {
+  const configuredUrl = normalizeServerUrl(import.meta.env.VITE_SERVER_URL);
+
+  if (typeof window === "undefined") {
+    return configuredUrl || "http://localhost:8000";
+  }
+
+  const host = String(window.location.hostname || "").toLowerCase();
+  const isLocalhost = host === "localhost" || host === "127.0.0.1";
+  const sameOriginUrl = normalizeServerUrl(window.location.origin);
+
+  // In production, prefer same-origin API unless env explicitly forces remote backend.
+  const forceRemote =
+    String(import.meta.env.VITE_FORCE_REMOTE_API || "").toLowerCase() === "true";
+
+  if (import.meta.env.PROD && !isLocalhost && !forceRemote) {
+    return sameOriginUrl || configuredUrl || "http://localhost:8000";
+  }
+
+  return configuredUrl || (isLocalhost ? "http://localhost:8000" : sameOriginUrl);
+};
+
 // Use environment variable for server URL, fallback to localhost for development.
 // This guard prevents malformed URLs when env value misses http/https.
 // eslint-disable-next-line react-refresh/only-export-components
-export const serverUrl =
-  normalizeServerUrl(import.meta.env.VITE_SERVER_URL) || "http://localhost:8000"
+export const serverUrl = getApiBaseUrl();
 
 if (import.meta.env.DEV && typeof window !== 'undefined') {
     console.log("[App] Backend Server URL:", serverUrl);
