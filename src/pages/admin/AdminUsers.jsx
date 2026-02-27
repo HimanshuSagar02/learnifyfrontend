@@ -19,6 +19,7 @@ import {
   FaTimesCircle,
   FaKey,
   FaSyncAlt,
+  FaTrashAlt,
 } from "react-icons/fa";
 
 const PAGE_SIZE = 10;
@@ -34,6 +35,7 @@ function AdminUsers() {
   const [creatingUser, setCreatingUser] = useState(false);
   const [statusUpdatingId, setStatusUpdatingId] = useState("");
   const [passwordSavingId, setPasswordSavingId] = useState("");
+  const [deletingUserId, setDeletingUserId] = useState("");
 
   const [form, setForm] = useState({
     name: "",
@@ -222,6 +224,29 @@ function AdminUsers() {
     }
   };
 
+  const deleteUser = async (user) => {
+    if (!user?._id) return;
+
+    const confirmed = window.confirm(
+      `Delete user "${user.name || user.email}"?\n\nThis action cannot be undone.`
+    );
+    if (!confirmed) return;
+
+    setDeletingUserId(user._id);
+    try {
+      await axios.delete(`${serverUrl}/api/admin/users/${user._id}`, {
+        withCredentials: true,
+      });
+      toast.success("User deleted successfully");
+      setEditingPassword(null);
+      fetchUsers();
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Failed to delete user");
+    } finally {
+      setDeletingUserId("");
+    }
+  };
+
   const clearFilters = () => {
     setFilters({ role: "", status: "" });
     setSearchTerm("");
@@ -335,6 +360,9 @@ function AdminUsers() {
               <h2 className="mb-4 flex items-center gap-2 text-lg font-bold text-gray-900">
                 <FaUserPlus className="text-[#3B82F6]" /> Create User
               </h2>
+              <p className="mb-3 rounded-lg border border-blue-200 bg-blue-50 p-2 text-xs text-blue-900">
+                Security note: Actual user passwords cannot be viewed. Use password update/reset only.
+              </p>
               <form
                 className="space-y-3"
                 onSubmit={(e) => {
@@ -507,6 +535,14 @@ function AdminUsers() {
                           <div className="mt-2 flex flex-wrap gap-3 text-xs text-gray-500">
                             {u.class ? <span>Class: {u.class}</span> : null}
                             {u.subject ? <span>Subject: {u.subject}</span> : null}
+                            <span>
+                              Enrolled Courses:{" "}
+                              {Number.isFinite(u.enrolledCoursesCount)
+                                ? u.enrolledCoursesCount
+                                : Array.isArray(u.enrolledCourses)
+                                  ? u.enrolledCourses.length
+                                  : 0}
+                            </span>
                             <span>Joined: {u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "N/A"}</span>
                           </div>
 
@@ -584,6 +620,14 @@ function AdminUsers() {
                           >
                             Reject
                           </button>
+                          <button
+                            className="inline-flex items-center gap-1 rounded-md border border-red-300 bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700 disabled:opacity-50"
+                            onClick={() => deleteUser(u)}
+                            disabled={deletingUserId === u._id}
+                          >
+                            <FaTrashAlt />
+                            {deletingUserId === u._id ? "Deleting..." : "Delete"}
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -621,4 +665,3 @@ function AdminUsers() {
 }
 
 export default AdminUsers;
-
