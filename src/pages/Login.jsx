@@ -15,6 +15,7 @@ import { setUserData } from '../redux/userSlice'
 import { clearSessionHint, markSessionHint } from '../utils/sessionHint'
 import { extractAuthToken, extractAuthUser } from '../utils/authPayload'
 import { clearAuthToken, setAuthToken } from '../utils/authToken'
+import Seo from '../components/Seo'
 
 function Login() {
     const [email, setEmail] = useState("")
@@ -210,8 +211,22 @@ function Login() {
     }
 
     return (
-        <div className='min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-3 sm:p-4'>
-            <div className='w-full max-w-6xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row'>
+        <>
+            <Seo
+                title='Login | Learnify Technical Learning Platform'
+                description='Log in to Learnify to access technical courses in web development, data structures, AI/ML, cloud and other career-focused learning paths.'
+                keywords={[
+                    'Learnify login',
+                    'technical learning platform login',
+                    'web development learning login',
+                    'AI ML course login',
+                    'student login Learnify'
+                ]}
+                canonicalPath='/login'
+                noIndex
+            />
+            <div className='min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-3 sm:p-4'>
+                <div className='w-full max-w-6xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row'>
                 {/* Left Side - Form */}
                 <div className='w-full md:w-[60%] p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-center'>
                     {/* Header */}
@@ -387,8 +402,9 @@ function Login() {
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
-        </div>
+        </>
     )
 }
 

@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { ClipLoader } from 'react-spinners'
 import { serverUrl } from '../App'
 import { toast } from 'react-toastify'
+import Seo from '../components/Seo'
 
 const REQUEST_TIMEOUT_MS = 20000;
 
@@ -144,6 +145,18 @@ function ForgotPassword() {
 
 
   return (
+     <>
+     <Seo
+       title='Forgot Password | Learnify'
+       description='Reset your Learnify account password to continue accessing your technical learning dashboard and courses.'
+       keywords={[
+         'Learnify password reset',
+         'forgot password Learnify',
+         'technical learning platform password reset'
+       ]}
+       canonicalPath='/forgotpassword'
+       noIndex
+     />
      <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
      { step==1 && <div className="bg-white shadow-md rounded-xl p-8 max-w-md w-full">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
@@ -301,6 +314,7 @@ function ForgotPassword() {
         </div>
       </div>}
     </div>
+    </>
   )
 }
 

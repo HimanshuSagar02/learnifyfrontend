@@ -12,19 +12,14 @@ const hostname = isBrowser ? window.location.hostname : ''
 const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1'
 const routerMode = String(import.meta.env.VITE_ROUTER_MODE || '').toLowerCase()
 const allowBrowserRouterInProd = String(import.meta.env.VITE_ALLOW_BROWSER_ROUTER_PROD || '').toLowerCase() === 'true'
-const isAuthPath = isBrowser && /^\/(login|signup)\/?$/i.test(window.location.pathname)
+const prefersBrowserRouter = routerMode === 'browser' || allowBrowserRouterInProd
 
 const shouldUseHashRouter =
-  (!isLocalhost && isAuthPath) ||
   routerMode === 'hash' ||
-  (
-    routerMode === 'browser'
-      ? (import.meta.env.PROD && !isLocalhost && !allowBrowserRouterInProd)
-      : (
-        import.meta.env.VITE_USE_HASH_ROUTER === 'true' ||
-        (import.meta.env.PROD && !isLocalhost)
-      )
-  )
+  (!prefersBrowserRouter && (
+    import.meta.env.VITE_USE_HASH_ROUTER === 'true' ||
+    (import.meta.env.PROD && !isLocalhost)
+  ))
 
 if (isBrowser && shouldUseHashRouter && !window.location.hash.startsWith('#/')) {
   const deepLinkPath = `${window.location.pathname}${window.location.search}`

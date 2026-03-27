@@ -19,6 +19,7 @@ import {
   FaUser,
 } from "react-icons/fa";
 import logo from "../assets/logo.jpg";
+import Seo from "../components/Seo";
 
 const ORGANISATION = {
   name: "Learnify Education",
@@ -84,6 +85,25 @@ function VerifyCertificate() {
   const qrCodeUrl = verificationLink
     ? `https://api.qrserver.com/v1/create-qr-code/?size=180x180&margin=10&data=${encodeURIComponent(verificationLink)}`
     : "";
+  const normalizedCertificateId = String(certificateId || searchId || "").trim().toUpperCase();
+  const shouldIndexPage = !normalizedCertificateId;
+  const seoTitle = certificate
+    ? `Verified Certificate | ${certificate.courseTitle || "Learnify Course"} | Learnify`
+    : error && normalizedCertificateId
+      ? "Certificate Verification Failed | Learnify"
+      : "Verify Certificate Online | Learnify";
+  const seoDescription = certificate
+    ? `Verify the authenticity of the Learnify ${certificate.courseTitle || "course"} certificate online through the official certificate validation page.`
+    : "Verify Learnify certificates online using the certificate ID and official validation page.";
+  const verificationStructuredData = shouldIndexPage
+    ? {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        name: "Verify Certificate Online | Learnify",
+        url: "https://learnifyedu.store/certificate/verify",
+        description: "Verify Learnify certificates online using the certificate ID and official validation page.",
+      }
+    : null;
 
   useEffect(() => {
     if (certificateId) {
@@ -138,8 +158,23 @@ function VerifyCertificate() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-blue-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <>
+      <Seo
+        title={seoTitle}
+        description={seoDescription}
+        keywords={[
+          "certificate verification",
+          "verify certificate online",
+          "Learnify certificate verification",
+          "certificate ID verification",
+          "online certificate validation",
+        ]}
+        canonicalPath={shouldIndexPage ? "/certificate/verify" : `/certificate/verify/${normalizedCertificateId}`}
+        noIndex={!shouldIndexPage}
+        structuredData={verificationStructuredData}
+      />
+      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-blue-50 py-8 px-4">
+        <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 rounded-2xl shadow-2xl p-6 md:p-8 mb-6 border border-blue-500/40 text-center">
           <div className="flex items-center justify-center gap-3 mb-4 flex-wrap">
@@ -444,8 +479,9 @@ function VerifyCertificate() {
             </div>
           </div>
         )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

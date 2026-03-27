@@ -15,6 +15,7 @@ import { setUserData } from '../redux/userSlice'
 import { clearSessionHint, markSessionHint } from '../utils/sessionHint'
 import { extractAuthToken, extractAuthUser } from '../utils/authPayload'
 import { clearAuthToken, setAuthToken } from '../utils/authToken'
+import Seo from '../components/Seo'
 
 function SignUp() {
     const [name, setName] = useState("")
@@ -148,8 +149,22 @@ function SignUp() {
     }
 
     return (
-        <div className='min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-3 sm:p-4'>
-            <div className='w-full max-w-6xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row'>
+        <>
+            <Seo
+                title='Sign Up | Learnify Online Technical Learning Platform'
+                description='Create your Learnify account to start learning web development, data structures, AI/ML, cloud, cybersecurity and language skills online.'
+                keywords={[
+                    'Learnify sign up',
+                    'online technical learning platform',
+                    'web development course signup',
+                    'AI ML learning platform signup',
+                    'student registration Learnify'
+                ]}
+                canonicalPath='/signup'
+                noIndex
+            />
+            <div className='min-h-screen w-full bg-gradient-to-br from-gray-50 via-white to-gray-100 flex items-center justify-center p-3 sm:p-4'>
+                <div className='w-full max-w-6xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row'>
                 {/* Left Side - Form */}
                 <div className='w-full md:w-[60%] p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-center'>
                     {/* Header */}
@@ -389,8 +404,9 @@ function SignUp() {
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
-        </div>
+        </>
     )
 }
 
